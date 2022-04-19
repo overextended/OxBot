@@ -6,10 +6,11 @@
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
-    "dev": "nodemon"
+    "dev": "nodemon -L"
   },
   "devDependencies": {
     "@types/node": "*",
+    "@types/node-fetch": "^2.6.1",
     "concurrently": "^7.1.0",
     "eslint": "^8.13.0",
     "nodemon": "^2.0.15",

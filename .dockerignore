@@ -1,0 +1,8 @@
+node_modules
+build
+.gitignore
+.eslintrc
+.prettierrc.json
+.prettierignore
+README.md
+Dockerfile
