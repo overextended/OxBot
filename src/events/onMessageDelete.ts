@@ -19,7 +19,7 @@ export const onMessageDelete = async (message: Message<boolean> | PartialMessage
     title: 'Message deleted',
     description: `Message from <@${message.author?.id}> deleted by <@${log.executor?.id}> in <#${message.channelId}>`,
     color: 'RED',
-    thumbnail: { url: `https://cdn.discordapp.com/avatars/${log.executor?.id}/${log.executor?.avatar}` },
+    thumbnail: { url: log.executor?.displayAvatarURL() },
     fields: fields,
   };
 
