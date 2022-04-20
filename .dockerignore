@@ -6,3 +6,4 @@ build
 .prettierignore
 README.md
 Dockerfile
+template.env

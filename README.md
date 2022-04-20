@@ -2,26 +2,21 @@ OxBot
 
 Both Development and Production require use of [Docker](https://www.docker.com/get-started/)
 
-### Developmment
+## Developmment
 
-## Setting up
+### Setting up
 
-Create a .env file with the following structure:
-```
-TOKEN=
-GUILD_ID=
-CLIENT_ID=
-```
-Fill in the variables depending on your application.
+Create a .env file with the following structure structure found in
+`template.env` and fill in the variables.
 
-## Starting the Application
+### Starting the Application
 
 In the root directory run:
 `docker compose up`
 
 Nodemon will watch for changes you make in the `src` directory.
 
-### Production
+## Production
 
 Set up an .env file like in the development process.
 

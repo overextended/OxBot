@@ -3,26 +3,23 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const CLIENT_ID = process.env.CLIENT_ID;
-const GUILD_ID_DEV = process.env.GUILD_ID_DEV;
-const GUILD_ID_OX = process.env.GUILD_ID_OX;
+const GUILD_ID = process.env.GUILD_ID;
 const DISCORD_TOKEN = process.env.TOKEN;
 
-if (!DISCORD_TOKEN || !CLIENT_ID || !GUILD_ID_DEV || !GUILD_ID_OX) {
+if (!DISCORD_TOKEN || !CLIENT_ID || !GUILD_ID) {
   throw new Error('Missing environment variables');
 }
 
 interface Env {
   DISCORD_TOKEN: string;
   CLIENT_ID: string;
-  GUILD_ID_DEV: string;
-  GUILD_ID_OX: string;
+  GUILD_ID: string;
 }
 
-const config: Env = {
+const Config: Env = {
   CLIENT_ID,
-  GUILD_ID_DEV,
-  GUILD_ID_OX,
+  GUILD_ID,
   DISCORD_TOKEN,
 };
 
-export default config;
+export default Config;

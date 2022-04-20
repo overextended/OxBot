@@ -1,4 +1,4 @@
-import config from './config';
+import Config from './config';
 import { Client, Intents } from 'discord.js';
 import { onInteraction } from './events/onInteraction';
 import { onReady } from './events/onReady';
@@ -11,4 +11,4 @@ Bot.once('ready', async () => await onReady(Bot));
 Bot.on('messageDelete', async (message) => await onMessageDelete(message));
 Bot.on('interactionCreate', async (interaction) => await onInteraction(interaction));
 
-Bot.login(config.DISCORD_TOKEN);
+Bot.login(Config.DISCORD_TOKEN);
