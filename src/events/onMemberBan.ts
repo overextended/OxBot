@@ -7,7 +7,7 @@ export const onMemberBan = async (ban: GuildBan) => {
   if (!log) return console.log('No audit log for the banned user found.');
   const banEmbed: MessageEmbedOptions = {
     title: 'Member banned',
-    description: `<@${ban.user.id}> has been banned by <@${log.executor?.id}>`,
+    description: `<@${ban.user.id}> has been **banned** by <@${log.executor?.id}>`,
     author: {
       name: log.executor?.tag,
       iconURL: log.executor?.displayAvatarURL(),

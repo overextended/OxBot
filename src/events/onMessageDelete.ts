@@ -17,9 +17,13 @@ export const onMessageDelete = async (message: Message<boolean> | PartialMessage
 
   const embed: MessageEmbedOptions = {
     title: 'Message deleted',
+    author: {
+      name: log.executor?.tag,
+      iconURL: log.executor?.displayAvatarURL(),
+    },
     description: `Message from <@${message.author?.id}> deleted by <@${log.executor?.id}> in <#${message.channelId}>`,
-    color: 'RED',
-    thumbnail: { url: log.executor?.displayAvatarURL() },
+    color: 'ORANGE',
+    thumbnail: { url: message.author?.displayAvatarURL() },
     fields: fields,
   };
 
