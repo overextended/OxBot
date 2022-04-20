@@ -1,4 +1,5 @@
 import { Message, MessageEmbedOptions, PartialMessage, EmbedFieldData, TextChannel } from 'discord.js';
+import { log_channel } from '../settings.json';
 
 export const onMessageDelete = async (message: Message<boolean> | PartialMessage) => {
   if (!message.guild) return;
@@ -22,6 +23,6 @@ export const onMessageDelete = async (message: Message<boolean> | PartialMessage
     fields: fields,
   };
 
-  const channel = message.guild.channels.cache.get('965625370881708042') as TextChannel;
+  const channel = message.guild.channels.cache.get(log_channel) as TextChannel;
   channel ? channel.send({ embeds: [embed] }) : message.channel.send('No specified log channel found.');
 };
