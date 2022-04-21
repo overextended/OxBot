@@ -11,3 +11,5 @@ COPY pnpm-lock.yaml ./
 RUN pnpm i
 
 COPY . .
+
+CMD [ "pnpm", "start:production" ]
