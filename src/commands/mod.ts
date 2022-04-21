@@ -13,13 +13,10 @@ const Mod: Command = {
         .setRequired(true)
         .addChoices({ name: 'ban', value: 'ban' }, { name: 'kick', value: 'kick' })
     )
-    .addUserOption((option) => option.setName('user').setDescription('User to act upon'))
-    .addStringOption((option) => option.setName('userid').setDescription('User ID to act upon'))
+    .addUserOption((option) => option.setName('user').setDescription('User to act upon').setRequired(true))
     .addStringOption((option) => option.setName('reason').setDescription('Punishment reason')),
   run: async (interaction) => {
-    const member =
-      interaction.guild?.members.cache.get(interaction.options.getString('userid') || '') ||
-      (interaction.options.getMember('user') as GuildMember);
+    const member = interaction.options.getMember('user', true) as GuildMember;
     const reason = interaction.options.getString('reason') || undefined;
     if (!member) return interaction.reply('No such user found.');
     if (!member.manageable) return interaction.reply('Unable to act upon the user.');
