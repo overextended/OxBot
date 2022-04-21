@@ -6,7 +6,7 @@ export const onMessageDelete = async (message: Message<boolean> | PartialMessage
   const logs = await message.guild.fetchAuditLogs({ limit: 1, type: 'MESSAGE_DELETE' });
   const log = logs.entries.first();
   if (!log) return console.log('No audit log for deleted message found.');
-  const fields: EmbedFieldData[] = [{ name: 'Message content', value: message.content || '' }];
+  const fields: EmbedFieldData[] = [{ name: 'Message content', value: message.content || 'No message content.' }];
   if (message.attachments) {
     message.attachments.map((attachment) => {
       attachment.name &&
