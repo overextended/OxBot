@@ -7,13 +7,7 @@ import { onMemberBan } from './events/onMemberBan';
 import { onMemberRemove } from './events/onMemberRemove';
 
 const Bot = new Client({
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_BANS,
-    Intents.FLAGS.GUILD_MEMBERS,
-    Intents.FLAGS.GUILD_MEMBERS,
-  ],
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_MEMBERS],
 });
 
 Bot.once('ready', async () => await onReady(Bot));
