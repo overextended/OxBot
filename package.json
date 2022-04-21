@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
+    "start:production": "pnpm build && pnpm start",
     "dev": "nodemon -L"
   },
   "devDependencies": {

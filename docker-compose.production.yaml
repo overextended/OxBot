@@ -3,4 +3,5 @@ services:
   bot:
     container_name: oxbot
     build: .
-    command: ['pnpm', 'start']
+    restart: unless-stopped
+    command: pnpm start:production
