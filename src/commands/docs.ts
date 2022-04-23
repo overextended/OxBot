@@ -6,9 +6,19 @@ const Docs: Command = {
   data: new SlashCommandBuilder()
     .setName('docs')
     .setDescription('Get a documentation link for an Overextended resource.')
-    .addStringOption((option) => option.setName('resource').setDescription('Resource to get the documentation for.')),
+    .addStringOption((option) =>
+      option
+        .setName('resource')
+        .setDescription('Resource to get the documentation for.')
+        .setRequired(true)
+        .addChoices(
+          { name: 'ox_lib', value: 'ox_lib' },
+          { name: 'ox_inventory', value: 'ox_inventory' },
+          { name: 'oxmysql', value: 'oxmysql' }
+        )
+    ),
   run: async (interaction) => {
-    const resource = interaction.options.getString('resource') || '';
+    const resource = interaction.options.getString('resource');
     const docsEmbed: MessageEmbedOptions = {
       title: 'Documentation',
       description: 'Please read the documentation thoroughly and carefully.',
