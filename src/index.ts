@@ -2,7 +2,6 @@ import Config from './config';
 import { Client, Intents } from 'discord.js';
 import { onInteraction } from './events/onInteraction';
 import { onReady } from './events/onReady';
-import { onMessageDelete } from './events/onMessageDelete';
 import { onMemberBan } from './events/onMemberBan';
 import { onMemberRemove } from './events/onMemberRemove';
 
@@ -14,7 +13,6 @@ Bot.once('ready', async () => await onReady(Bot));
 
 Bot.on('guildMemberRemove', async (member) => await onMemberRemove(member));
 Bot.on('guildBanAdd', async (ban) => await onMemberBan(ban));
-Bot.on('messageDelete', async (message) => await onMessageDelete(message));
 Bot.on('interactionCreate', async (interaction) => await onInteraction(interaction));
 
 Bot.login(Config.DISCORD_TOKEN);
