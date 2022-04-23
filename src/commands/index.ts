@@ -3,5 +3,6 @@ import Mod from './mod';
 import Ping from './ping';
 import Repo from './repo';
 import Docs from './docs';
+import Framework from './framework';
 
-export const CommandList: Command[] = [Ping, Repo, Mod, Docs];
+export const CommandList: Command[] = [Ping, Repo, Mod, Docs, Framework];
