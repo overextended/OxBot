@@ -5,6 +5,7 @@ export const onMemberBan = async (ban: GuildBan) => {
   const logs = await ban.guild.fetchAuditLogs({ limit: 1, type: 'MEMBER_BAN_ADD' });
   const log = logs.entries.first();
   if (!log) return console.log('No audit log for the banned user found.');
+  if (log.executor?.id === '874059310869655662') return; // Check for Warden
   const banEmbed: MessageEmbedOptions = {
     title: 'Member banned',
     description: `<@${ban.user.id}> has been **banned** by <@${log.executor?.id}>`,
