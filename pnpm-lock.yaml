@@ -1,4 +1,4 @@
-lockfileVersion: 5.3
+lockfileVersion: 5.4
 
 specifiers:
   '@discordjs/builders': ^0.13.0
@@ -31,7 +31,7 @@ devDependencies:
   eslint: 8.13.0
   nodemon: 2.0.15
   prettier: 2.6.2
-  ts-node: 10.7.0_17a82b5ac88a5de7094eac76b4edda13
+  ts-node: 10.7.0_c6ucwwwirjo6ockovr3lj3o2cm
   typescript: 4.6.3
 
 packages:
@@ -1404,7 +1404,7 @@ packages:
     resolution: {integrity: sha512-hvE+ZYXuINrx6Ei6D6hz+PTim0Uf++dYbK9FFifLNwQj+RwKquhQpn868yZsCtJYiclZF1u8l6WZxxKi+vv7Rg==}
     dev: false
 
-  /ts-node/10.7.0_17a82b5ac88a5de7094eac76b4edda13:
+  /ts-node/10.7.0_c6ucwwwirjo6ockovr3lj3o2cm:
     resolution: {integrity: sha512-TbIGS4xgJoX2i3do417KSaep1uRAW/Lu+WAL2doDHC0D6ummjirVOXU5/7aiZotbQ5p1Zp9tP7U6cYhA0O7M8A==}
     hasBin: true
     peerDependencies:

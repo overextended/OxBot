@@ -5,5 +5,6 @@ import Repo from './repo';
 import Docs from './docs';
 import Guild from './framework';
 import Ox from './ox';
+import Release from './release';
 
-export const CommandList: Command[] = [Ping, Repo, Mod, Docs, Guild, Ox];
+export const CommandList: Command[] = [Ping, Repo, Mod, Docs, Guild, Ox, Release];
