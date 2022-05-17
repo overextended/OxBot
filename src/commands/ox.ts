@@ -6,7 +6,7 @@ const OxEmbed: MessageEmbedOptions = {
   title: 'Overextended',
   color: 'AQUA',
   description:
-    'Overextended is a small group working to create open-source resoruces for FiveM, with focus on security, performance and stability.',
+    'Overextended is a small group working to create open-source resources for FiveM, with focus on security, performance and stability.',
   thumbnail: { url: 'https://i.imgur.com/Rp4xZiU.png' },
   fields: [
     {
