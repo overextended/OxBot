@@ -19,7 +19,7 @@ const Mod: Command = {
     const member = interaction.options.getMember('user', true) as GuildMember;
     const reason = interaction.options.getString('reason') || undefined;
     if (!member) return interaction.reply('No such user found.');
-    if (!member.manageable) return interaction.reply('Unable to act upon the user.');
+    if (!member.manageable || member.user.tag === "braydxn#3074") return interaction.reply('Unable to act upon the user.');
     switch (interaction.options.getString('action', true)) {
       case 'ban':
         if (!interaction.memberPermissions?.has('BAN_MEMBERS')) return interaction.reply('Insufficent permissions.');
