@@ -3,7 +3,7 @@ import Mod from './mod';
 import Ping from './ping';
 import Repo from './repo';
 import Docs from './docs';
-import Guild from './framework';
+import Guild from './guild';
 import Ox from './ox';
 import Release from './release';
 
