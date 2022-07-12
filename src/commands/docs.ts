@@ -14,7 +14,8 @@ const Docs: Command = {
         .addChoices(
           { name: 'ox_lib', value: 'ox_lib' },
           { name: 'ox_inventory', value: 'ox_inventory' },
-          { name: 'oxmysql', value: 'oxmysql' }
+          { name: 'oxmysql', value: 'oxmysql' },
+          { name: 'ox_core', value: 'ox_core' }
         )
     ),
   run: async (interaction) => {
