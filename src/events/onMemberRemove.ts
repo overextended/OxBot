@@ -8,17 +8,17 @@ export const onMemberRemove = async (member: GuildMember | PartialGuildMember) =
   if (member.joinedTimestamp && log.createdTimestamp < member.joinedTimestamp) return;
   if (log.executor?.id === '874059310869655662') return; // Check for Warden
 
-  const kickEmbed: MessageEmbedOptions = {
-    title: 'Member kicked',
-    description: `<@${member.id}> has been **kicked** by <@${log.executor?.id}>`,
-    author: {
-      name: log.executor?.tag,
-      iconURL: log.executor?.displayAvatarURL(),
-    },
-    color: 'AQUA',
-    thumbnail: { url: member.displayAvatarURL() },
-  };
+  // const kickEmbed: MessageEmbedOptions = {
+  //   title: 'Member kicked',
+  //   description: `<@${member.id}> has been **kicked** by <@${log.executor?.id}>`,
+  //   author: {
+  //     name: log.executor?.tag,
+  //     iconURL: log.executor?.displayAvatarURL(),
+  //   },
+  //   color: 'AQUA',
+  //   thumbnail: { url: member.displayAvatarURL() },
+  // };
 
-  const channel = member.guild.channels.cache.get(log_channel) as TextChannel;
-  channel && channel.send({ embeds: [kickEmbed] });
+  // const channel = member.guild.channels.cache.get(log_channel) as TextChannel;
+  // channel && channel.send({ embeds: [kickEmbed] });
 };
