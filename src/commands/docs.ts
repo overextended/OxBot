@@ -15,7 +15,8 @@ const Docs: Command = {
           { name: 'ox_lib', value: 'ox_lib' },
           { name: 'ox_inventory', value: 'ox_inventory' },
           { name: 'oxmysql', value: 'oxmysql' },
-          { name: 'ox_core', value: 'ox_core' }
+          { name: 'ox_core', value: 'ox_core' },
+          { name: 'ox_target', value: 'ox_target' }
         )
     ),
   run: async (interaction) => {
