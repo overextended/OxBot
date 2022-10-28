@@ -12,6 +12,7 @@ const Guild: Command = {
         .setRequired(true)
         .addChoices(
           { name: 'ESX', value: 'esx' },
+          { name: 'Qbox', value: 'qbox' },
           { name: 'QBCore', value: 'qb' },
           { name: 'project-error', value: 'project-error' },
           { name: 'txAdmin', value: 'txAdmin' },
@@ -22,6 +23,8 @@ const Guild: Command = {
     switch (interaction.options.getString('name')) {
       case 'qb':
         return interaction.reply('https://discord.gg/qbcore');
+      case 'qbox':
+        return interaction.reply('https://discord.gg/qbox');
       case 'esx':
         return interaction.reply('https://discord.com/invite/RPX2GssV6r');
       case 'project-error':
