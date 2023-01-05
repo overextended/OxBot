@@ -24,7 +24,7 @@ const Guild: Command = {
       case 'qb':
         return interaction.reply('https://discord.gg/qbcore');
       case 'qbox':
-        return interaction.reply('https://discord.gg/qbox');
+        return interaction.reply('https://discord.gg/AtbwBuJHN5');
       case 'esx':
         return interaction.reply('https://discord.com/invite/RPX2GssV6r');
       case 'project-error':
