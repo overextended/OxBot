@@ -16,7 +16,8 @@ const Docs: Command = {
           { name: 'ox_inventory', value: 'ox_inventory' },
           { name: 'oxmysql', value: 'oxmysql' },
           { name: 'ox_core', value: 'ox_core' },
-          { name: 'ox_target', value: 'ox_target' }
+          { name: 'ox_target', value: 'ox_target' },
+          { name: 'ox_doorlock', value: 'ox_doorlock' }
         )
     ),
   run: async (interaction) => {
