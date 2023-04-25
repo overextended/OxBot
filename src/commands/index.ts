@@ -6,5 +6,6 @@ import Docs from './docs';
 import Guild from './guild';
 import Ox from './ox';
 import Release from './release';
+import BulkUnban from './bulkunban';
 
-export const CommandList: Command[] = [Ping, Repo, Mod, Docs, Guild, Ox, Release];
+export const CommandList: Command[] = [Ping, Repo, Mod, Docs, Guild, Ox, Release, BulkUnban];
