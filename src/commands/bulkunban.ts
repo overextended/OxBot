@@ -17,9 +17,10 @@ const BulkUnban: Command = {
 
     const reason = interaction.options.getString('reason', true);
     let amount = 0;
-    interaction.guild.bans.cache.forEach((ban) => {
+    const bans = await interaction.guild.bans.fetch();
+    bans.forEach((ban) => {
       if (!ban.reason || !ban.reason.includes(reason)) return;
-      interaction.guild?.members.unban(ban.user.id);
+      interaction.guild?.members.unban(ban.user.id, `Used /bulkunban: ${reason}`);
       amount++;
     });
 
