@@ -16,6 +16,7 @@ const Docs: Command = {
           { name: 'ox_inventory', value: 'ox_inventory' },
           { name: 'oxmysql', value: 'oxmysql' },
           { name: 'ox_core', value: 'ox_core' },
+          { name: 'ox_fuel', value: 'ox_fuel' },
           { name: 'ox_target', value: 'ox_target' },
           { name: 'ox_doorlock', value: 'ox_doorlock' }
         )
@@ -29,7 +30,7 @@ const Docs: Command = {
       fields: [
         {
           name: resource || 'Website',
-          value: `https://overextended.github.io/docs/${resource}`,
+          value: `https://overextended.dev/${resource}`,
         },
       ],
     };
