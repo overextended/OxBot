@@ -27,7 +27,7 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
 
   const messageDeleteEmbed: MessageEmbedOptions = {
     title: 'Message removed',
-    description: `<@${message.author?.id}> removed a message in <#${message.channel.id}>`,
+    description: `Message sent by <@${message.author?.id}> was removed a message in <#${message.channel.id}>`,
     author: {
       name: message.author?.username,
       iconURL: message.author?.displayAvatarURL(),
