@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { CommandInteraction, MessageEmbedOptions } from 'discord.js';
 import { Command } from '../interfaces/command';
 import fetch from 'node-fetch';
+import { GithubApi, GithubUrl } from '../constants';
 
 const Repo: Command = {
   data: new SlashCommandBuilder()
@@ -18,7 +19,7 @@ const Repo: Command = {
 };
 
 const newEmbed = async (interaction: CommandInteraction, repository: string) => {
-  const response = await fetch(`https://api.github.com/repos/overextended/${repository}`);
+  const response = await fetch(`${GithubApi}/${repository}`);
   if (response.status !== 200) return interaction.reply('No such Overextended repository found.');
   const data = await response.json();
   const repoEmbed: MessageEmbedOptions = {
@@ -31,7 +32,7 @@ const newEmbed = async (interaction: CommandInteraction, repository: string) => 
       { name: 'Forks', value: data.forks.toString(), inline: true },
       { name: 'Stars', value: data.stargazers_count.toString(), inline: true },
     ],
-    url: `https://github.com/overextended/${repository}`,
+    url: `${GithubUrl}/${repository}`,
   };
   return interaction.reply({ embeds: [repoEmbed] });
 };
