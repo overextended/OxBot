@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { MessageEmbedOptions } from 'discord.js';
 import { Command } from '../interfaces/command';
+import { DocsUrl, ResourceChoices } from '../constants';
 
 const Docs: Command = {
   data: new SlashCommandBuilder()
@@ -11,15 +12,7 @@ const Docs: Command = {
         .setName('resource')
         .setDescription('Resource to get the documentation for.')
         .setRequired(true)
-        .addChoices(
-          { name: 'ox_lib', value: 'ox_lib' },
-          { name: 'ox_inventory', value: 'ox_inventory' },
-          { name: 'oxmysql', value: 'oxmysql' },
-          { name: 'ox_core', value: 'ox_core' },
-          { name: 'ox_fuel', value: 'ox_fuel' },
-          { name: 'ox_target', value: 'ox_target' },
-          { name: 'ox_doorlock', value: 'ox_doorlock' }
-        )
+        .addChoices(...ResourceChoices)
     ),
   run: async (interaction) => {
     const resource = interaction.options.getString('resource');
@@ -30,7 +23,7 @@ const Docs: Command = {
       fields: [
         {
           name: resource || 'Website',
-          value: `https://overextended.dev/${resource}`,
+          value: `${DocsUrl}/${resource}`,
         },
       ],
     };
