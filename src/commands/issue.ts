@@ -16,8 +16,8 @@ const issue: Command = {
     ),
   run: async (interaction: CommandInteraction) => {
     const repo = interaction.options.getString('repository');
-    const link = `${GithubUrl}/${repo}/issues` || 'Unknown repository';
-    await interaction.reply(`Issue link for ${repo}: ${link}`);
+    const link = `${GithubUrl}/${repo}/issues/new/choose` || 'Unknown repository';
+    await interaction.reply(`Submit Issue for **${repo}**: <${link}>`);
   },
 };
 
