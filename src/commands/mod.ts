@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { GuildMember } from 'discord.js';
+import { GuildMember, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { Command } from '../interfaces/command';
 
 const Mod: Command = {
@@ -15,22 +14,47 @@ const Mod: Command = {
     )
     .addUserOption((option) => option.setName('user').setDescription('User to act upon').setRequired(true))
     .addStringOption((option) => option.setName('reason').setDescription('Punishment reason')),
-  run: async (interaction) => {
-    const member = interaction.options.getMember('user', true) as GuildMember;
-    const reason = interaction.options.getString('reason') || undefined;
-    if (!member) return interaction.reply('No such user found.');
-    if (!member.manageable) return interaction.reply('Unable to act upon the user.');
-    switch (interaction.options.getString('action', true)) {
+  async run(interaction) {
+    const memberOption = interaction.options.get('user');
+    const member = memberOption?.member as GuildMember;
+
+    const reasonOption = interaction.options.get('reason');
+    const reason = (reasonOption?.value as string) || undefined;
+
+    if (!member) {
+      await interaction.reply('No such user found.');
+      return;
+    }
+    if (!member.manageable) {
+      await interaction.reply('Unable to act upon the user.');
+      return;
+    }
+
+    const actionOption = interaction.options.get('action');
+    const action = actionOption?.value as string;
+
+    switch (action) {
       case 'ban':
-        if (!interaction.memberPermissions?.has('BAN_MEMBERS')) return interaction.reply('Insufficent permissions.');
+        if (!interaction.memberPermissions?.has(PermissionFlagsBits.BanMembers)) {
+          await interaction.reply('Insufficent permissions.');
+          return;
+        }
         interaction.guild?.members.ban(member, { reason: reason });
-        return await interaction.reply(`Successfully banned <@${member.user.id}>`);
+        await interaction.reply(`Successfully banned <@${member.user.id}>`);
+        return;
+
       case 'kick':
-        if (!interaction.memberPermissions?.has('KICK_MEMBERS')) return interaction.reply('Insufficent permissions.');
+        if (!interaction.memberPermissions?.has(PermissionFlagsBits.KickMembers)) {
+          await interaction.reply('Insufficent permissions.');
+          return;
+        }
         interaction.guild?.members.kick(member, reason);
-        return await interaction.reply(`Successfully kicked <@${member.user.id}>`);
+        await interaction.reply(`Successfully kicked <@${member.user.id}>`);
+        return;
+
       default:
-        return await interaction.reply('Mod action failed.');
+        await interaction.reply('Mod action failed.');
+        return;
     }
   },
 };

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder } from 'discord.js';
 import { Command } from '../interfaces/command';
 
 const Guild: Command = {
@@ -19,17 +19,27 @@ const Guild: Command = {
         )
     ),
   run: async (interaction) => {
-    switch (interaction.options.getString('name')) {
+    const guildName = interaction.options.get('name')?.value as string;
+
+    switch (guildName) {
       case 'qbox':
-        return interaction.reply('https://discord.gg/AtbwBuJHN5');
+        await interaction.reply('https://discord.gg/AtbwBuJHN5');
+        break;
       case 'esx':
-        return interaction.reply('https://discord.com/invite/RPX2GssV6r');
+        await interaction.reply('https://discord.com/invite/RPX2GssV6r');
+        break;
       case 'project-error':
-        return interaction.reply('https://discord.gg/FbFXcM5rGz');
+        await interaction.reply('https://discord.gg/FbFXcM5rGz');
+        break;
       case 'txAdmin':
-        return interaction.reply('https://discord.gg/yWxjt9zPWR');
+        await interaction.reply('https://discord.gg/yWxjt9zPWR');
+        break;
       case 'cfx':
-        return interaction.reply('https://discord.gg/fivem');
+        await interaction.reply('https://discord.gg/fivem');
+        break;
+      default:
+        await interaction.reply({ content: 'Invalid guild selected.', ephemeral: true });
+        break;
     }
   },
 };

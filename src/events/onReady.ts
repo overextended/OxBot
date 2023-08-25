@@ -1,6 +1,4 @@
-import { Client, TextChannel } from 'discord.js';
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
+import { Client, TextChannel, REST, Routes } from 'discord.js';
 import { CommandList } from '../commands';
 import Config from '../config';
 import { log_channel } from '../settings.json';
