@@ -13,7 +13,7 @@ const Repo: Command = {
           .setName('name')
           .setDescription('Name of an Overextended repository.')
           .setRequired(true)
-          .addChoices(...ResourceChoices) // Use the choices method
+          .addChoices(...ResourceChoices)
     ),
   async execute(interaction: CommandInteraction) {
     const repositoryName = interaction.options.get('name')?.value as string;

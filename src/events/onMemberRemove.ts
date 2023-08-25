@@ -1,5 +1,5 @@
 import { GuildMember, EmbedBuilder, PartialGuildMember, TextChannel, AuditLogEvent } from 'discord.js';
-import { Bot } from '..'; // Ensure this path is correct
+import { Bot } from '..';
 import { log_channel } from '../settings.json';
 
 export const onMemberRemove = async (member: GuildMember | PartialGuildMember) => {

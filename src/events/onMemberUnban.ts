@@ -2,7 +2,6 @@ import { AuditLogEvent, GuildBan, EmbedBuilder, TextChannel } from 'discord.js';
 import { log_channel } from '../settings.json';
 
 export const onMemberUnban = async (unban: GuildBan) => {
-  // Fetch the audit logs for the unbanning event
   const logs = await unban.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberBanRemove });
   const log = logs.entries.first();
 
@@ -12,9 +11,8 @@ export const onMemberUnban = async (unban: GuildBan) => {
 
   if (log.executor.id === '874059310869655662') return; // Check for Warden
 
-  // Create the embed for the unban
   const unbanEmbed = new EmbedBuilder()
-    .setColor(0x00ff00) // green to signify something positive
+    .setColor(0x00ff00) 
     .setTitle('Member Unbanned')
     .setDescription(`<@${unban.user.id}> has been **unbanned** by <@${log.executor.id}>`)
     .addFields({ name: 'Reason', value: log.reason || 'No reason provided.' })
@@ -26,7 +24,6 @@ export const onMemberUnban = async (unban: GuildBan) => {
     .setFooter({ text: `Member ID: ${unban.user.id}` })
     .setThumbnail(unban.user.displayAvatarURL());
 
-  // Send the embed to the logging channel
   const channel = unban.guild.channels.cache.get(log_channel) as TextChannel;
   channel && channel.send({ embeds: [unbanEmbed] });
 };

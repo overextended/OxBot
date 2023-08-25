@@ -18,7 +18,6 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
   const authorId = message.author?.id || 'Unknown ID';
   const messageId = message.id || 'Unknown ID';
 
-  // Fetch the audit logs
   const fetchedLogs = await message.guild.fetchAuditLogs({
     limit: 1,
     type: AuditLogEvent.MessageDelete,
@@ -28,7 +27,7 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
 
   let deleterId;
   if (deletionLog) {
-    const { executor } = deletionLog; // Here, executor is a user object.
+    const { executor } = deletionLog;
     deleterId = executor?.id;
   }
 

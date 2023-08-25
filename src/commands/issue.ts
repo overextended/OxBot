@@ -12,7 +12,7 @@ const Issue: Command = {
           .setName('repository')
           .setDescription('Select the repository')
           .setRequired(true)
-          .addChoices(...ResourceChoices) // Use the choices method from your docs.ts
+          .addChoices(...ResourceChoices)
     ),
   async execute(interaction: CommandInteraction) {
     const repo = interaction.options.get('repository')?.value as string;

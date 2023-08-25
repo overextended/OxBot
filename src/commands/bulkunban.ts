@@ -5,7 +5,7 @@ const BulkUnban: Command = {
   data: new SlashCommandBuilder()
     .setName('bulkunban')
     .setDescription('Unban all people with the reason included')
-    .addStringOption((option) =>
+    .addStringOption(option =>
       option
         .setName('reason')
         .setDescription('The reason to check for, this checks if the provided string is included in the reason')
