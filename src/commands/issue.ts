@@ -1,9 +1,8 @@
-import { CommandInteraction } from 'discord.js';
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../interfaces/command';
 import { GithubUrl, ResourceChoices } from '../constants';
 
-const issue: Command = {
+const Issue: Command = {
   data: new SlashCommandBuilder()
     .setName('issue')
     .setDescription('Get the issue link for a specific repository.')
@@ -14,11 +13,15 @@ const issue: Command = {
         .setRequired(true)
         .addChoices(...ResourceChoices)
     ),
-  run: async (interaction: CommandInteraction) => {
-    const repo = interaction.options.getString('repository');
-    const link = `${GithubUrl}/${repo}/issues/new/choose` || 'Unknown repository';
+  async run(interaction: CommandInteraction) {
+    const repo = interaction.options.get('repository')?.value as string;
+    if (!repo) {
+      await interaction.reply({ content: 'Invalid repository selected.', ephemeral: true });
+      return;
+    }
+    const link = `${GithubUrl}/${repo}/issues/new/choose`;
     await interaction.reply(`Submit Issue for **${repo}**: <${link}>`);
   },
 };
 
-export default issue;
+export default Issue;

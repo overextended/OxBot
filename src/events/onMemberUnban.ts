@@ -1,8 +1,8 @@
 import { Guild, GuildAuditLogsEntry, EmbedBuilder, TextChannel, AuditLogEvent } from 'discord.js';
 import { log_channel } from '../settings.json';
 
-export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
-  if (auditLogEntry.action !== AuditLogEvent.MemberBanAdd) {
+export const onMemberUnban = async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
+  if (auditLogEntry.action !== AuditLogEvent.MemberBanRemove) {
     return;
   }
 
@@ -13,7 +13,7 @@ export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Gui
   // Ensure the executor is cached.
   const executor = await guild.client.users.fetch(auditLogEntry.executorId);
 
-  // Ensure the banned guild member is cached.
+  // Ensure the unbanned guild member is cached.
   const targetUser = await guild.client.users.fetch(auditLogEntry.targetId);
 
   if (!executor || !targetUser) {
@@ -22,10 +22,10 @@ export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Gui
 
   if (auditLogEntry.executorId === '874059310869655662') return; // Check for Warden
 
-  const banEmbed = new EmbedBuilder()
-    .setColor('#ff0000')
-    .setTitle('Member Banned')
-    .setDescription(`<@${targetUser.id}> has been **banned** by <@${executor.id}>.`)
+  const unbanEmbed = new EmbedBuilder()
+    .setColor('#00ff00')
+    .setTitle('Member Unbanned')
+    .setDescription(`<@${targetUser.id}> has been **unbanned** by <@${executor.id}>.`)
     .addFields({ name: 'Reason', value: auditLogEntry.reason || 'No reason provided.' })
     .setAuthor({
       name: targetUser.username || 'Unknown Username',
@@ -36,5 +36,5 @@ export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Gui
     .setThumbnail(targetUser.displayAvatarURL());
 
   const channel = guild.channels.cache.get(log_channel) as TextChannel;
-  channel && channel.send({ embeds: [banEmbed] });
+  channel && channel.send({ embeds: [unbanEmbed] });
 };
