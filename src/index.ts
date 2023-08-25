@@ -20,12 +20,18 @@ export const Bot = new Client({
 Bot.once('ready', async () => await onReady(Bot));
 
 Bot.on(Events.GuildAuditLogEntryCreate, async (auditLogEntry, guild) => {
-  if (auditLogEntry.action === AuditLogEvent.MemberBanAdd) {
-    await onMemberBan(auditLogEntry, guild);
-  } else if (auditLogEntry.action === AuditLogEvent.MemberBanRemove) {
-    await onMemberUnban(auditLogEntry, guild);
-  } else if (auditLogEntry.action === AuditLogEvent.MemberKick) {
-    await onMemberRemove(auditLogEntry, guild);
+  switch (auditLogEntry.action) {
+    case AuditLogEvent.MemberBanAdd:
+      await onMemberBan(auditLogEntry, guild);
+      break;
+    case AuditLogEvent.MemberBanRemove:
+      await onMemberUnban(auditLogEntry, guild);
+      break;
+    case AuditLogEvent.MemberKick:
+      await onMemberRemove(auditLogEntry, guild);
+      break;
+    default:
+      break;
   }
 });
 

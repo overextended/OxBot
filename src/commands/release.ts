@@ -3,7 +3,7 @@ import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 const Release: Command = {
   data: new SlashCommandBuilder().setName('release').setDescription('Download release instead of source code'),
-  execute: async (interaction) => {
+  run: async (interaction) => {
     await interaction.reply({ embeds: [releaseEmbed()] });
   },
 };

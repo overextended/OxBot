@@ -10,7 +10,7 @@
     "dev": "nodemon -L"
   },
   "devDependencies": {
-    "@types/node": "20.5.4",
+    "@types/node": "^18.17.1",
     "@types/node-fetch": "^2.6.4",
     "concurrently": "^8.2.1",
     "eslint": "^8.47.0",

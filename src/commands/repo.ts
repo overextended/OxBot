@@ -7,15 +7,14 @@ const Repo: Command = {
   data: new SlashCommandBuilder()
     .setName('repo')
     .setDescription('Fetch Overextended repository')
-    .addStringOption(
-      (option) =>
-        option
-          .setName('name')
-          .setDescription('Name of an Overextended repository.')
-          .setRequired(true)
-          .addChoices(...ResourceChoices)
+    .addStringOption((option) =>
+      option
+        .setName('name')
+        .setDescription('Name of an Overextended repository.')
+        .setRequired(true)
+        .addChoices(...ResourceChoices)
     ),
-  async execute(interaction: CommandInteraction) {
+  async run(interaction: CommandInteraction) {
     const repositoryName = interaction.options.get('name')?.value as string;
     await newEmbed(interaction, repositoryName);
   },

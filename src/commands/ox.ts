@@ -3,7 +3,7 @@ import { Command } from '../interfaces/command';
 
 const Ox: Command = {
   data: new SlashCommandBuilder().setName('ox').setDescription('About Overextended'),
-  execute: async (interaction) => {
+  run: async (interaction) => {
     await interaction.reply({ embeds: [oxEmbed()] });
   },
 };

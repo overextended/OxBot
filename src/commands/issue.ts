@@ -6,15 +6,14 @@ const Issue: Command = {
   data: new SlashCommandBuilder()
     .setName('issue')
     .setDescription('Get the issue link for a specific repository.')
-    .addStringOption(
-      (option) =>
-        option
-          .setName('repository')
-          .setDescription('Select the repository')
-          .setRequired(true)
-          .addChoices(...ResourceChoices)
+    .addStringOption((option) =>
+      option
+        .setName('repository')
+        .setDescription('Select the repository')
+        .setRequired(true)
+        .addChoices(...ResourceChoices)
     ),
-  async execute(interaction: CommandInteraction) {
+  async run(interaction: CommandInteraction) {
     const repo = interaction.options.get('repository')?.value as string;
     if (!repo) {
       await interaction.reply({ content: 'Invalid repository selected.', ephemeral: true });

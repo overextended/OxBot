@@ -5,13 +5,13 @@ const BulkUnban: Command = {
   data: new SlashCommandBuilder()
     .setName('bulkunban')
     .setDescription('Unban all people with the reason included')
-    .addStringOption(option =>
+    .addStringOption((option) =>
       option
         .setName('reason')
         .setDescription('The reason to check for, this checks if the provided string is included in the reason')
         .setRequired(true)
     ),
-  async execute(interaction) {
+  async run(interaction) {
     if (!interaction.guild) {
       await interaction.reply('This command can only be run in a guild.');
       return;

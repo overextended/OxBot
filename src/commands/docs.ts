@@ -13,7 +13,7 @@ const Docs: Command = {
         .setRequired(true)
         .addChoices(...ResourceChoices)
     ),
-  async execute(interaction: CommandInteraction) {
+  async run(interaction: CommandInteraction) {
     const resourceOption = interaction.options.get('resource');
     const resource = resourceOption?.value as string;
     await sendDocumentationEmbed(interaction, resource);
