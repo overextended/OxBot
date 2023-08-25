@@ -1,42 +1,40 @@
-import { GuildMember, EmbedBuilder, PartialGuildMember, TextChannel, AuditLogEvent } from 'discord.js';
-import { Bot } from '..';
+import { Guild, GuildAuditLogsEntry, EmbedBuilder, TextChannel, AuditLogEvent } from 'discord.js';
 import { log_channel } from '../settings.json';
 
-export const onMemberRemove = async (member: GuildMember | PartialGuildMember) => {
-  if (member.partial) {
-    try {
-      await member.fetch();
-    } catch (error) {
-      console.error('Error fetching the member:', error);
-      return;
-    }
+export const onMemberRemove = async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
+  if (auditLogEntry.action !== AuditLogEvent.MemberKick) {
+    return;
   }
 
-  if (!member.guild) return;
+  if (!auditLogEntry.executorId || !auditLogEntry.targetId) {
+    return console.log('Executor ID or target ID is missing from the audit log entry.');
+  }
 
-  const logs = await member.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberKick });
-  const log = logs.entries.first();
-  if (!log) return console.log('No audit log for kicked member found.');
-  if (member.joinedTimestamp && log.createdTimestamp < member.joinedTimestamp) return;
-  if (log.executor?.id === '874059310869655662') return; // Check for Warden
+  // Ensure the executor is cached.
+  const executor = await guild.client.users.fetch(auditLogEntry.executorId);
 
-  const kickedMemberId = member.id;
-  const kickerId = log.executor?.id;
+  // Ensure the kicked guild member is cached.
+  const targetUser = await guild.client.users.fetch(auditLogEntry.targetId);
 
-  const embed = new EmbedBuilder()
-    .setColor('#ff0000')
+  if (!executor || !targetUser) {
+    return console.log('Executor or target user is missing from the audit log entry.');
+  }
+
+  if (auditLogEntry.executorId === '874059310869655662') return; // Check for Warden
+
+  const removeEmbed = new EmbedBuilder()
+    .setColor(0xffa500)
     .setTitle('Member Kicked')
-    .setDescription(`<@${kickedMemberId}> was kicked by <@${kickerId}>.`)
-    .addFields({ name: 'Reason', value: log.reason || 'No reason provided.' })
-    .setFooter({ text: `Member ID: ${kickedMemberId}` })
-    .setTimestamp(log.createdTimestamp)
+    .setDescription(`<@${targetUser.id}> has been **kicked** by <@${executor.id}>.`)
+    .addFields({ name: 'Reason', value: auditLogEntry.reason || 'No reason provided.' })
     .setAuthor({
-      name: member.user?.username || 'Unknown Username',
-      iconURL: member.user?.displayAvatarURL() || undefined,
-    });
+      name: targetUser.username || 'Unknown Username',
+      iconURL: targetUser.displayAvatarURL(),
+    })
+    .setTimestamp(auditLogEntry.createdAt)
+    .setFooter({ text: `Member ID: ${targetUser.id}` })
+    .setThumbnail(targetUser.displayAvatarURL());
 
-  const logChannel = Bot.channels.cache.get(log_channel) as TextChannel;
-  if (logChannel) {
-    logChannel.send({ embeds: [embed] });
-  }
+  const channel = guild.channels.cache.get(log_channel) as TextChannel;
+  channel && channel.send({ embeds: [removeEmbed] });
 };

@@ -1,5 +1,5 @@
 import Config from './config';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, Events, AuditLogEvent } from 'discord.js';
 import { onInteraction } from './events/onInteraction';
 import { onReady } from './events/onReady';
 import { onMemberBan } from './events/onMemberBan';
@@ -19,9 +19,16 @@ export const Bot = new Client({
 
 Bot.once('ready', async () => await onReady(Bot));
 
-Bot.on('guildMemberRemove', async (member) => await onMemberRemove(member));
-Bot.on('guildBanAdd', async (ban) => await onMemberBan(ban));
-Bot.on('guildBanRemove', async (unban) => await onMemberUnban(unban));
+Bot.on(Events.GuildAuditLogEntryCreate, async (auditLogEntry, guild) => {
+  if (auditLogEntry.action === AuditLogEvent.MemberBanAdd) {
+    await onMemberBan(auditLogEntry, guild);
+  } else if (auditLogEntry.action === AuditLogEvent.MemberBanRemove) {
+    await onMemberUnban(auditLogEntry, guild);
+  } else if (auditLogEntry.action === AuditLogEvent.MemberKick) {
+    await onMemberRemove(auditLogEntry, guild);
+  }
+});
+
 Bot.on('interactionCreate', async (interaction) => await onInteraction(interaction));
 Bot.on('messageDelete', async (message) => await onMessageDelete(message));
 

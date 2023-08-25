@@ -1,29 +1,40 @@
-import { AuditLogEvent, GuildBan, EmbedBuilder, TextChannel } from 'discord.js';
+import { Guild, GuildAuditLogsEntry, EmbedBuilder, TextChannel, AuditLogEvent } from 'discord.js';
 import { log_channel } from '../settings.json';
 
-export const onMemberUnban = async (unban: GuildBan) => {
-  const logs = await unban.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberBanRemove });
-  const log = logs.entries.first();
-
-  if (!log || !log.executor) {
-    return console.log('No audit log for the unbanned user found or executor is missing.');
+export const onMemberUnban = async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
+  if (auditLogEntry.action !== AuditLogEvent.MemberBanRemove) {
+    return;
   }
 
-  if (log.executor.id === '874059310869655662') return; // Check for Warden
+  if (!auditLogEntry.executorId || !auditLogEntry.targetId) {
+    return console.log('Executor ID or target ID is missing from the audit log entry.');
+  }
+
+  // Ensure the executor is cached.
+  const executor = await guild.client.users.fetch(auditLogEntry.executorId);
+
+  // Ensure the unbanned guild member is cached.
+  const targetUser = await guild.client.users.fetch(auditLogEntry.targetId);
+
+  if (!executor || !targetUser) {
+    return console.log('Executor or target user is missing from the audit log entry.');
+  }
+
+  if (auditLogEntry.executorId === '874059310869655662') return; // Check for Warden
 
   const unbanEmbed = new EmbedBuilder()
-    .setColor(0x00ff00) 
+    .setColor(0x00ff00)
     .setTitle('Member Unbanned')
-    .setDescription(`<@${unban.user.id}> has been **unbanned** by <@${log.executor.id}>`)
-    .addFields({ name: 'Reason', value: log.reason || 'No reason provided.' })
+    .setDescription(`<@${targetUser.id}> has been **unbanned** by <@${executor.id}>.`)
+    .addFields({ name: 'Reason', value: auditLogEntry.reason || 'No reason provided.' })
     .setAuthor({
-      name: unban.user.username || 'Unknown Username',
-      iconURL: unban.user.displayAvatarURL(),
+      name: targetUser.username || 'Unknown Username',
+      iconURL: targetUser.displayAvatarURL(),
     })
-    .setTimestamp(log.createdTimestamp)
-    .setFooter({ text: `Member ID: ${unban.user.id}` })
-    .setThumbnail(unban.user.displayAvatarURL());
+    .setTimestamp(auditLogEntry.createdAt)
+    .setFooter({ text: `Member ID: ${targetUser.id}` })
+    .setThumbnail(targetUser.displayAvatarURL());
 
-  const channel = unban.guild.channels.cache.get(log_channel) as TextChannel;
+  const channel = guild.channels.cache.get(log_channel) as TextChannel;
   channel && channel.send({ embeds: [unbanEmbed] });
 };

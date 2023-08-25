@@ -1,29 +1,40 @@
-import { AuditLogEvent, GuildBan, EmbedBuilder, TextChannel, Guild, User } from 'discord.js';
+import { Guild, GuildAuditLogsEntry, EmbedBuilder, TextChannel, AuditLogEvent } from 'discord.js';
 import { log_channel } from '../settings.json';
 
-export const onMemberBan = async (ban: GuildBan) => {
-  const logs = await ban.guild.fetchAuditLogs({ limit: 1, type: AuditLogEvent.MemberBanAdd });
-  const log = logs.entries.first();
-
-  if (!log || !log.executor) {
-    return console.log('No audit log for the banned user found or executor is missing.');
+export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
+  if (auditLogEntry.action !== AuditLogEvent.MemberBanAdd) {
+    return;
   }
 
-  if (log.executor.id === '874059310869655662') return; // Check for Warden
+  if (!auditLogEntry.executorId || !auditLogEntry.targetId) {
+    return console.log('Executor ID or target ID is missing from the audit log entry.');
+  }
+
+  // Ensure the executor is cached.
+  const executor = await guild.client.users.fetch(auditLogEntry.executorId);
+
+  // Ensure the banned guild member is cached.
+  const targetUser = await guild.client.users.fetch(auditLogEntry.targetId);
+
+  if (!executor || !targetUser) {
+    return console.log('Executor or target user is missing from the audit log entry.');
+  }
+
+  if (auditLogEntry.executorId === '874059310869655662') return; // Check for Warden
 
   const banEmbed = new EmbedBuilder()
     .setColor(0xff0000)
     .setTitle('Member Banned')
-    .setDescription(`<@${ban.user.id}> has been **banned** by <@${log.executor.id}>.`)
-    .addFields({ name: 'Reason', value: log.reason || 'No reason provided.' })
+    .setDescription(`<@${targetUser.id}> has been **banned** by <@${executor.id}>.`)
+    .addFields({ name: 'Reason', value: auditLogEntry.reason || 'No reason provided.' })
     .setAuthor({
-      name: ban.user.username || 'Unknown Username',
-      iconURL: ban.user.displayAvatarURL(),
+      name: targetUser.username || 'Unknown Username',
+      iconURL: targetUser.displayAvatarURL(),
     })
-    .setTimestamp(log.createdTimestamp)
-    .setFooter({ text: `Member ID: ${ban.user.id}` })
-    .setThumbnail(ban.user.displayAvatarURL());
+    .setTimestamp(auditLogEntry.createdAt)
+    .setFooter({ text: `Member ID: ${targetUser.id}` })
+    .setThumbnail(targetUser.displayAvatarURL());
 
-  const channel = ban.guild.channels.cache.get(log_channel) as TextChannel;
+  const channel = guild.channels.cache.get(log_channel) as TextChannel;
   channel && channel.send({ embeds: [banEmbed] });
 };
