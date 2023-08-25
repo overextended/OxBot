@@ -11,7 +11,7 @@ const Ox: Command = {
 function oxEmbed() {
   const embed = new EmbedBuilder()
     .setTitle('Overextended')
-    .setColor(0x00ffff)
+    .setColor('#00ffff')
     .setDescription(
       'Overextended is a small group working to create open-source resources for FiveM, with focus on security, performance and stability.'
     )

@@ -29,7 +29,7 @@ const newEmbed = async (interaction: CommandInteraction, repository: string) => 
   const data = await response.json();
 
   const repoEmbed = new EmbedBuilder()
-    .setColor(0x0099ff)
+    .setColor('#0099ff')
     .setTitle(data.name)
     .setDescription(data.description)
     .setThumbnail('https://i.imgur.com/Rp4xZiU.png')

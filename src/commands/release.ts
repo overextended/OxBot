@@ -14,7 +14,7 @@ function releaseEmbed(): EmbedBuilder {
     .setDescription(
       'If you are getting a no such export error, or an error saying that the UI needs to be built, please ensure you downloaded a release zip instead of the source code.'
     )
-    .setColor(0xff0000)
+    .setColor('#ff0000')
     .addFields(
       {
         name: 'Source code',

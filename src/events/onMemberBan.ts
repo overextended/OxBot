@@ -23,7 +23,7 @@ export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Gui
   if (auditLogEntry.executorId === '874059310869655662') return; // Check for Warden
 
   const banEmbed = new EmbedBuilder()
-    .setColor(0xff0000)
+    .setColor('#ff0000')
     .setTitle('Member Banned')
     .setDescription(`<@${targetUser.id}> has been **banned** by <@${executor.id}>.`)
     .addFields({ name: 'Reason', value: auditLogEntry.reason || 'No reason provided.' })

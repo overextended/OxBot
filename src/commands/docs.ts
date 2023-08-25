@@ -24,7 +24,7 @@ const sendDocumentationEmbed = async (interaction: CommandInteraction, resource:
   const docsEmbed = new EmbedBuilder()
     .setTitle('Documentation')
     .setDescription('Please read the documentation thoroughly and carefully.')
-    .setColor(0x26e0a5)
+    .setColor('#26e0a5')
     .addFields({
       name: resource || 'Website',
       value: `${DocsUrl}/${resource}`,
