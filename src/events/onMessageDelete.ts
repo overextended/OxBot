@@ -33,7 +33,7 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
   const embed = new EmbedBuilder()
     .setColor('#ff0000')
     .setTitle('Message Deleted')
-    .setDescription(`Message sent by <@${authorId}> in ${message.channel.toString()} was deleted by <@${deleterId}>.`)
+    .setDescription(`Message sent by <@${authorId}> in ${message.channel.toString()} was deleted.`)
     .addFields({ name: 'Message Content', value: `${content}\n\n` })
     .setFooter({ text: `Author ID: ${authorId} | Message ID: ${messageId}` })
     .setTimestamp(message.createdTimestamp)
