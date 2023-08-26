@@ -1,4 +1,4 @@
-import { Message, EmbedBuilder, PartialMessage, TextChannel, AuditLogEvent } from 'discord.js';
+import { Message, EmbedBuilder, PartialMessage, TextChannel, AuditLogEvent, Attachment } from 'discord.js';
 import { Bot } from '..';
 import { log_channel } from '../settings.json';
 
@@ -24,7 +24,6 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
   });
 
   const deletionLog = fetchedLogs.entries.first();
-
   let deleterId;
   if (deletionLog) {
     const { executor } = deletionLog;
@@ -34,7 +33,7 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
   const embed = new EmbedBuilder()
     .setColor('#ff0000')
     .setTitle('Message Deleted')
-    .setDescription(`Message sent by <@${authorId}> in ${message.channel.toString()} was deleted by <@${deleterId}>.`)
+    .setDescription(`Message sent by <@${authorId}> in ${message.channel.toString()} was deleted.`)
     .addFields({ name: 'Message Content', value: `${content}\n\n` })
     .setFooter({ text: `Author ID: ${authorId} | Message ID: ${messageId}` })
     .setTimestamp(message.createdTimestamp)
@@ -44,7 +43,7 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
     });
 
   let i = 0;
-  message.attachments.forEach((attachment) => {
+  message.attachments.forEach((attachment: Attachment) => {
     if (i < 24) {
       embed.addFields({ name: `Attachment ${i + 1}`, value: attachment.url });
       i++;
