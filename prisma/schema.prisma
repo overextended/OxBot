@@ -1,0 +1,16 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./database.db"
+}
+
+model Warns {
+  id Int @id @default(autoincrement())
+  reason String
+  issuerId String
+  targetId String
+  issuedAt DateTime
+}
