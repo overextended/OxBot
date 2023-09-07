@@ -6,9 +6,10 @@ import { log_channel } from '../settings.json';
 export const onReady = async (Bot: Client) => {
   const rest = new REST({ version: '10' }).setToken(Config.DISCORD_TOKEN);
   const commandData = Array.from(commands.values()).map((command) => command.data.toJSON());
-  //await rest.put(Routes.applicationGuildCommands(Config.CLIENT_ID, Config.GUILD_ID), { body: commandData }); // Register Commands with Guild Only
-  await rest.put(Routes.applicationCommands(Config.CLIENT_ID), { body: commandData }); // Register Commands Globally
+  await rest.put(Routes.applicationCommands(Config.CLIENT_ID), { body: commandData });
+  const commandCount = commandData.length;
+  const logMessage = `Bot started. ${commandCount} commands registered.`;
   const logChannel = Bot.channels.cache.get(log_channel) as TextChannel;
-  logChannel && (await logChannel.send('Bot started.'));
+  logChannel && (await logChannel.send(logMessage));
   console.log('Bot ready');
 };
