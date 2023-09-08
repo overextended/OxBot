@@ -6,7 +6,7 @@ const commands = new Map<string, Command>();
 
 const commandFiles = fs
   .readdirSync(path.join(__dirname, '../commands'))
-  .filter((file) => file.endsWith('.ts') && file !== 'index.ts');
+  .filter((file) => (file.endsWith('.ts') || file.endsWith('.js')) && file !== 'index.ts');
 
 for (const file of commandFiles) {
   const commandModule = require(path.join(__dirname, '../commands', file));
