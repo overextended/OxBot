@@ -6,6 +6,7 @@ import { onMemberBan } from './events/onMemberBan';
 import { onMemberUnban } from './events/onMemberUnban';
 import { onMemberRemove } from './events/onMemberRemove';
 import { onMessageDelete } from './events/onMessageDelete';
+import { onMessageCreate } from './events/onMessageCreate';
 
 export const Bot = new Client({
   intents: [
@@ -37,5 +38,6 @@ Bot.on(Events.GuildAuditLogEntryCreate, async (auditLogEntry, guild) => {
 
 Bot.on('interactionCreate', async (interaction) => await onInteraction(interaction));
 Bot.on('messageDelete', async (message) => await onMessageDelete(message));
+Bot.on('messageCreate', async (message) => await onMessageCreate(message));
 
 Bot.login(Config.DISCORD_TOKEN);
