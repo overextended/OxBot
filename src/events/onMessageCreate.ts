@@ -3,14 +3,9 @@ import { Message } from 'discord.js';
 const ignoredRoles = [
   '814181424840179733', // Admin
   '819891382114189332', // Shrimp Supreme
-  '933681479878324234', // Dictator
   '892853647950618675', // Overextended
   '831961060314972170', // Senior Moderator
   '945991885783175189', // Moderator
-  '906292806098759750', // Contributor
-  '1120932120056057926', // Affiliate
-  '816709868764921876', // Coffee Drinker
-  '842456416019021895', // Recognized Member
   '1140367518230397029', // GitHub
 ];
 const patterns = [
@@ -19,12 +14,35 @@ const patterns = [
   /can'?t\s+(type|post)\s+in\s+support/i,
   /help\s+(with\s+)?(typing|posting)\s+in\s+support/i,
   /help/i,
-  /cant\s+type/i,
-  /can'?t\s+type/i,
+  /can'?t\s+(type|post)/i,
+  /cant\s+(type|post)/i,
   /need\s+support/i,
   /support\s+needed/i,
   /how\s+can\s+i/i,
   /\bsupport\b/i,
+  /can'?t\s+post/i,
+  /unable\s+to\s+post/i,
+  /not\s+allowed\s+to\s+post/i,
+  /posting\s+issue/i,
+  /\btrouble\s+(with\s+)?(typing|posting)\s+in\s+support\b/i,
+  /\block(ed)?\s+(from\s+)?(typing|posting)\s+in\s+support\b/i,
+  /\baccess\s+issue\s+(with\s+)?support\b/i,
+  /\bpermission\s+to\s+(type|post)\s+in\s+support\b/i,
+  /\bhow\s+to\s+(type|post)\s+in\s+support\b/i,
+  /\bverify\b/i,
+  /\bissue\s+(with\s+)?(typing|posting)\s+in\b/i,
+  /\bcan'?t\s+access\s+support\b/i,
+  /\bno\s+access\s+to\s+support\b/i,
+  /\bwhy\s+am\s+i\s+(not\s+)?allowed\s+to\s+(type|post)\b/i,
+  /supp[ou]{1,2}rt/i, 
+  /s[ua]pport/i,
+  /supo{1,2}rt/i,
+  /h[eu]{1,2}lp/i,
+  /he[pl]{1,2}/i,
+  /[hu]elp/i,
+  /is\s+there\s+a\s+way/i,
+  /how\s+can\s+i/i,
+  /how\s+do/i,
 ];
 
 const guidelines = '<#1114827068337815612>';
