@@ -3,41 +3,32 @@ import { Message } from 'discord.js';
 const ignoredRoles = [
   '814181424840179733', // Admin
   '819891382114189332', // Shrimp Supreme
+  '933681479878324234', // Dictator
   '892853647950618675', // Overextended
   '831961060314972170', // Senior Moderator
   '945991885783175189', // Moderator
+  '906292806098759750', // Contributor
+  '1120932120056057926', // Affiliate
+  '816709868764921876', // Coffee Drinker
+  '842456416019021895', // Recognized Member
   '1140367518230397029', // GitHub
 ];
+
 const patterns = [
-  /(\bwhy\s+can'?t\s+i\s+(not\s+)?(type|post)\s+in\s+support\??\b)|(\bwhy\s+can'?t\s+i\b)|(\btype|post\b)|(\bsupport\b)/i,
-  /(\bhow\s+can\s+i\s+get\s+verified\s+(to\s+)?(type|post)\s+in\s+support\b)|(\bhow\s+can\s+i\b)|(\bget\s+verified\b)|(\btype|post\b)|(\bsupport\b)/i,
-  /(\bcan'?t\s+(type|post)\s+in\s+support\b)|(\bcan'?t\b)|(\btype|post\b)|(\bsupport\b)/i,
-  /(\bhelp\s+(with\s+)?(typing|posting)\s+in\s+support\b)|(\bhelp\b)|(\btyping|posting\b)|(\bsupport\b)/i,
-  /(\bhelp\b)/i,
-  /(\bcan'?t\s+(type|post)\b)|(\bcan'?t\b)|(\btype|post\b)/i,
-  /(\bcant\s+(type|post)\b)|(\bcant\b)|(\btype|post\b)/i,
-  /(\bneed\s+support\b)|(\bneed\b)|(\bsupport\b)/i,
-  /(\bsupport\s+needed\b)|(\bsupport\b)|(\bneeded\b)/i,
-  /(\bhow\s+can\s+i\b)|(\bhow\b)|(\bcan\b)|(\bi\b)/i,
-  /(\bsupport\b)/i,
-  /(\bcan'?t\s+post\b)|(\bcan'?t\b)|(\bpost\b)/i,
-  /(\bunable\s+to\s+post\b)|(\bunable\b)|(\bto\b)|(\bpost\b)/i,
-  /(\bnot\s+allowed\s+to\s+post\b)|(\bnot\b)|(\ballowed\b)|(\bto\b)|(\bpost\b)/i,
-  /(\bposting\s+issue\b)|(\bposting\b)|(\bissue\b)/i,
-  /(\btrouble\s+(with\s+)?(typing|posting)\s+in\s+support\b)|(\btrouble\b)|(\bwith\b)|(\btyping|posting\b)|(\bsupport\b)/i,
-  /(\block(ed)?\s+(from\s+)?(typing|posting)\s+in\s+support\b)|(\block(ed)?\b)|(\bfrom\b)|(\btyping|posting\b)|(\bsupport\b)/i,
-  /(\baccess\s+issue\s+(with\s+)?support\b)|(\baccess\b)|(\bissue\b)|(\bwith\b)|(\bsupport\b)/i,
-  /(\bpermission\s+to\s+(type|post)\s+in\s+support\b)|(\bpermission\b)|(\bto\b)|(\btype|post\b)|(\bsupport\b)/i,
-  /(\bhow\s+to\s+(type|post)\s+in\s+support\b)|(\bhow\b)|(\bto\b)|(\btype|post\b)|(\bsupport\b)/i,
-  /(\bverify\b)/i,
-  /(\bissue\s+(with\s+)?(typing|posting)\s+in\b)|(\bissue\b)|(\bwith\b)|(\btyping|posting\b)|(\bin\b)/i,
-  /(\bcan'?t\s+access\s+support\b)|(\bcan'?t\b)|(\baccess\b)|(\bsupport\b)/i,
-  /(\bno\s+access\s+to\s+support\b)|(\bno\b)|(\baccess\b)|(\bto\b)|(\bsupport\b)/i,
-  /(\bwhy\s+am\s+i\s+(not\s+)?allowed\s+to\s+(type|post)\b)|(\bwhy\b)|(\bam\b)|(\bi\b)|(\bnot\b)|(\ballowed\b)|(\bto\b)|(\btype|post\b)/i,
-  /(\bhlep\b)/i, 
-  /(\bsuport\b)/i, 
-  /(\bhalp\b)/i, 
-  /(\bsupport\b)/i, 
+  /(\bhelp\b|\bhlep\b|\bhalp\b)/i, // help, hlep, halp
+  /(\bsupport\b|\bsuport\b)/i, // support, suport
+  /(\bhow\s+can\b)/i, // how can
+  /(\bcant\b|\bcan't\b)/i, // cant, can't
+  /(\btype\b)/i, // type
+  /(\bpost\b)/i, // post
+  /(\bhow\b)/i, // how
+  /(\bsomehow\b)/i, // somehow
+  /(\bis\s+there\b)/i, // is there
+  /(\bcan\b)/i, // can
+  /(\bpossible\b)/i, // possible
+  /(\berror\b)/i, // error
+  /(\bwont\b)/i, // wont
+  /(\bconnect\b)/i, // connect
 ];
 
 const guidelines = '<#1114827068337815612>';
@@ -60,8 +51,18 @@ const channelSpecificResponses: ChannelResponses = {
   ],
 };
 
+const whitelistedChannelIds = [
+  '829915571394052176', // coffee-club
+  '906294817678590012', // nerd-club
+  `844240881283366962`, // shitposting
+];
+
 export const onMessageCreate = async (message: Message) => {
   if (message.author.bot) {
+    return;
+  }
+
+  if (whitelistedChannelIds.includes(message.channelId)) {
     return;
   }
 
