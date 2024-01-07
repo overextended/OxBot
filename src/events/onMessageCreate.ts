@@ -1,56 +1,78 @@
 import { Message } from 'discord.js';
-import { ignoredRoles, whitelistedChannels, guidelines } from '../constants';
-import { patterns } from '../utils/patterns';
+import { ignoredRoles, whitelistedChannels } from '../constants';
+import { positivePatterns, negativePatterns, resourcePatterns } from '../utils/patterns';
+import { guidelineResponses, resourceResponses } from '../utils/responses';
 
-interface ChannelResponses {
-  [key: string]: string[];
-}
-
-const generalResponseMessages = [`For Support Read: ${guidelines}`];
-
-const channelSpecificResponses: ChannelResponses = {
-  // General Channel
-  '813030955598086177': [
-    `Read the channel description, dip shit.`,
-    `Does this look like the support channel? Read ${guidelines}.`,
-    `For Support Read: ${guidelines}`,
-    `I wonder what this is for? ${guidelines}`,
-    `For fucks sake, read ${guidelines}`,
-    `Have you had a chance to review our ${guidelines} channel?`,
-  ],
-};
+const userResponseCooldown = new Map<string, { count: number; lastResponseTime: number }>();
 
 export const onMessageCreate = async (message: Message) => {
-  if (message.author.bot) {
-    return;
-  }
-
-  if (whitelistedChannels.includes(message.channelId)) {
+  if (message.author.bot || whitelistedChannels.includes(message.channelId)) {
     return;
   }
 
   const member = message.member;
-  if (!member) {
+  if (!member || member.roles.cache.some((role) => ignoredRoles.includes(role.id))) {
     return;
   }
 
-  const hasIgnoredRole = member.roles.cache.some((role) => ignoredRoles.includes(role.id));
+  const lowerCaseMessage = message.content.toLowerCase();
+  const userId = message.author.id;
+  const now = Date.now();
+  const cooldownPeriod = 15 * 60 * 1000;
 
-  if (!hasIgnoredRole) {
-    const lowerCaseMessage = message.content.toLowerCase();
-
-    const isMatch = patterns.some((pattern) => pattern.test(lowerCaseMessage));
-
-    if (isMatch) {
-      let responseMessages;
-      if (channelSpecificResponses[message.channelId]) {
-        responseMessages = channelSpecificResponses[message.channelId];
-      } else {
-        responseMessages = generalResponseMessages;
+  // Check if user is in cooldown
+  if (userResponseCooldown.has(userId)) {
+    const userData = userResponseCooldown.get(userId);
+    if (userData && now - userData.lastResponseTime < cooldownPeriod) {
+      if (userData.count >= 3) {
+        return; // User is in cooldown, do not respond
       }
+    } else {
+      // Reset count if cooldown has expired
+      userResponseCooldown.set(userId, { count: 0, lastResponseTime: now });
+    }
+  } else {
+    userResponseCooldown.set(userId, { count: 0, lastResponseTime: now });
+  }
 
-      const randomResponse = responseMessages[Math.floor(Math.random() * responseMessages.length)];
-      await message.reply(randomResponse);
+  // Check against negative patterns first
+  const isNegativeMatch = negativePatterns.some((pattern) => pattern.test(lowerCaseMessage));
+  if (isNegativeMatch) {
+    return; // Do not respond if negative pattern is matched
+  }
+
+  const sendReplyAndUpdateCooldown = async (response: string) => {
+    await message.reply(response);
+
+    const userData = userResponseCooldown.get(userId);
+    if (userData) {
+      userData.count++;
+      userData.lastResponseTime = now;
+
+      if (userData.count === 3) {
+        await message.reply("I need to recharge my tolerance battery; it's running dangerously low.");
+      }
+    }
+  };
+
+  // Check against resource patterns
+  const isResourceMatch = resourcePatterns.some((pattern) => pattern.test(lowerCaseMessage));
+  if (isResourceMatch) {
+    const randomResourceResponse = resourceResponses[Math.floor(Math.random() * resourceResponses.length)];
+    await sendReplyAndUpdateCooldown(randomResourceResponse);
+    return;
+  }
+
+  // Check against positive patterns
+  const isPositiveMatch = positivePatterns.some((pattern) => pattern.test(lowerCaseMessage));
+  if (isPositiveMatch) {
+    const channelId = message.channelId;
+    if (channelId in guidelineResponses) {
+      const responseMessages = guidelineResponses[channelId];
+      if (responseMessages) {
+        const randomResponse = responseMessages[Math.floor(Math.random() * responseMessages.length)];
+        await sendReplyAndUpdateCooldown(randomResponse);
+      }
     }
   }
 };

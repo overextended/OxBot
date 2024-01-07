@@ -34,5 +34,4 @@ export const guidelines = '<#1114827068337815612>';
 export const whitelistedChannels = [
   '829915571394052176', // coffee-club
   '906294817678590012', // nerd-club
-  `844240881283366962`, // shitposting
 ];
