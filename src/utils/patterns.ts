@@ -71,6 +71,11 @@ export const positivePatterns = [
   /(\bsomeone\s+can\s+tell\s+me\s+how\b)/i, // someone can tell me how
   /(\bsql\s+is\s+not\s+connecting\b)/i, // sql is not connecting
   /(\bi\s+have\s+a\s+question\b)/i, // i have a question
+  /(\bhow\s+do\s+we\s+program\b)/i, // how do we program
+  /(\bis\s+there\s+a\s+way\b)/i, // is there a way
+  /(\bi\s+want\s+to\s+convert\b)/i, // i want to convert
+  /(\bsomeone\s+give\s+me\s+the\s+code\b)/i, // someone give me the code
+  /(\bconvert\s+it\s+for\s+me\b)/i, // convert it for me
 ];
 
 export const negativePatterns = [
