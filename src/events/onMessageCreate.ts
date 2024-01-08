@@ -1,7 +1,7 @@
 import { Message } from 'discord.js';
 import { ignoredRoles, whitelistedChannels } from '../constants';
 import { positivePatterns, negativePatterns, resourcePatterns } from '../utils/patterns';
-import { guidelineResponses, resourceResponses } from '../utils/responses';
+import { guidelineResponses, resourceResponses, cooldownResponses } from '../utils/responses';
 
 const userResponseCooldown = new Map<string, { count: number; lastResponseTime: number }>();
 
@@ -50,7 +50,9 @@ export const onMessageCreate = async (message: Message) => {
       userData.lastResponseTime = now;
 
       if (userData.count === 3) {
-        await message.reply("I need to recharge my tolerance battery; it's running dangerously low.");
+        const randomIndex = Math.floor(Math.random() * cooldownResponses.length);
+        const randomCooldownMessage = cooldownResponses[randomIndex];
+        await message.reply(randomCooldownMessage);
       }
     }
   };
