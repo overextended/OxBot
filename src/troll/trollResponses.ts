@@ -15,7 +15,7 @@ customTrollResponses.set('300457650615746561', [
 // Andy
 customTrollResponses.set('243440367066677251', [
   "psst...No one uses NDCore.",
-  "ND = Andy? So is it actually AndyCore? Who is names a framework after themselves?",
+  "ND = Andy? So is it actually AndyCore? Who names a framework after themselves?",
   "NDCore is a joke.",
   "What even is NDCore?",
 ]);
