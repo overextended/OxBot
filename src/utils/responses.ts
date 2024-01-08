@@ -37,3 +37,16 @@ export const resourceResponses: string[] = [
   "Before using a resource it's usually a good idea to read the documentation. [READ THE DOCS HERE!](https://overextended.dev/)",
   "[RTFM!](https://overextended.dev/)",
 ];
+
+export const cooldownResponses: string[] = [
+  "I need to recharge my tolerance battery; it's running dangerously low.",
+  "I'd explain it in simpler terms, but I'm not sure they exist. Let me step away to see if I can invent some.",
+  "Pardon me while I translate your words into something resembling coherent thought. This might take longer than expected, so I'll be back later.",
+  "I would engage in a battle of intelligence with you, but it seems you're unarmed. I'll return when you've found some ammunition.",
+  "Your understanding is so cute, in a 'lost in the wilderness' kind of way. I'll go find a map and get back to you.",
+  "Sorry, my expertise doesn't cover the field of the blatantly obvious. I'll take a short break to broaden my horizons.",
+  "I could give you an intelligent response, but I prefer to keep our conversation realistic. Let me take a walk in the realm of common sense and see if I can find anything for you.",
+  "I'm sorry, I don't speak 'stupid'. I'll go learn the language and get back to you.",
+  "I'll come back once you've learned how to read.",
+  "Am I the idiot here, or are you? I'll go find out and get back to you.",
+];
