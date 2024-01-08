@@ -76,6 +76,10 @@ export const positivePatterns = [
   /(\bi\s+want\s+to\s+convert\b)/i, // i want to convert
   /(\bsomeone\s+give\s+me\s+the\s+code\b)/i, // someone give me the code
   /(\bconvert\s+it\s+for\s+me\b)/i, // convert it for me
+  /(\bwhy\s+is\s+it\s+broken\b)/i, // why is it broken
+  /(\bno\s+work\b)/i, // no work
+  /(\bdoesn'?t\s+work\b)/i, // doesn't work, doesnt work
+  /(\bdoes\s+anyone\s+know\b)/i, // does anyone know
 ];
 
 export const negativePatterns = [
