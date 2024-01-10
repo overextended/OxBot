@@ -11,19 +11,3 @@ customTrollResponses.set('300457650615746561', [
   "If you wanted me to touch you, you could have just asked.",
   "pssst...I know your secrets.",
 ]);
-
-// Andy
-customTrollResponses.set('243440367066677251', [
-  "psst...No one uses NDCore.",
-  "ND = Andy? So is it actually AndyCore? Who names a framework after themselves?",
-  "NDCore is a joke.",
-  "What even is NDCore?",
-]);
-
-// Scully
-customTrollResponses.set('530698981920079882', [
-  "Shut up already.",
-  "You like to talk a lot, don't you?",
-  "Are you seriously selling an Umbrella Glider for $5? Alright Mary Poppins.",
-  "Are you seriously selling a Bodycam UI for $5? It's not even original.",
-]);
