@@ -96,7 +96,24 @@ async function sendWarningDM(user: User, reason: string, timeoutDuration: number
 }
 
 function calculateTimeoutDuration(warnCount: number): number {
-  return 60000 * warnCount; // 1 minute per warn
+  let minutes;
+
+  switch (warnCount) {
+    case 1:
+      minutes = 5; // 5 minutes for the first warning
+      break;
+    case 2:
+      minutes = 10; // 10 minutes for the second warning
+      break;
+    case 3:
+      minutes = 60; // 1 hour for the third warning
+      break;
+    default:
+      minutes = 24 * 60; // 1 day for the fourth and subsequent warnings
+      break;
+  }
+
+  return minutes * 60000;
 }
 
 export default Warn;
