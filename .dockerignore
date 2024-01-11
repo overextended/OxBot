@@ -8,4 +8,4 @@ build
 README.md
 Dockerfile
 template.env
-.db
+*.db
