@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, CommandInteraction, EmbedBuilder } from 'discord.js';
-import { Command } from '../interfaces/command';
+import { Command } from '../../interfaces/command';
 
 const Whois: Command = {
   data: new SlashCommandBuilder()

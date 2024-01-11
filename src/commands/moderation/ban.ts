@@ -1,7 +1,6 @@
-// BanCommand.ts
 import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
-import { Command } from '../interfaces/command';
+import { Command } from '../../interfaces/command';
 
 const prisma = new PrismaClient();
 
@@ -43,6 +42,8 @@ const Ban: Command = {
     }
 
     try {
+      await interaction.guild.members.ban(user, { reason: reason, deleteMessageDays: deleteMessageDays });
+
       await prisma.ban.create({
         data: {
           reason: reason,
@@ -51,7 +52,6 @@ const Ban: Command = {
         },
       });
 
-      await interaction.guild.members.ban(user, { reason: reason, deleteMessageDays: deleteMessageDays });
       await interaction.reply({ content: `Banned <@${user.id}>. Reason: ${reason}`, ephemeral: true });
     } catch (error) {
       console.error(error);

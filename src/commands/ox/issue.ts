@@ -1,6 +1,6 @@
 import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
-import { Command } from '../interfaces/command';
-import { GithubUrl, ResourceChoices } from '../constants';
+import { Command } from '../../interfaces/command';
+import { GithubUrl, ResourceChoices } from '../../constants';
 
 const Issue: Command = {
   data: new SlashCommandBuilder()

@@ -1,6 +1,6 @@
 import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command } from '../interfaces/command';
-import { DocsUrl, ResourceChoices } from '../constants';
+import { Command } from '../../interfaces/command';
+import { DocsUrl, ResourceChoices } from '../../constants';
 
 const Docs: Command = {
   data: new SlashCommandBuilder()

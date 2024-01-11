@@ -1,4 +1,4 @@
-import { Command } from '../interfaces/command';
+import { Command } from '../../interfaces/command';
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 
 const Release: Command = {
