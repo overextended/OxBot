@@ -1,7 +1,7 @@
 import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command } from '../interfaces/command';
+import { Command } from '../../interfaces/command';
 import fetch from 'node-fetch';
-import { GithubApi, GithubUrl, ResourceChoices } from '../constants';
+import { GithubApi, GithubUrl, ResourceChoices } from '../../constants';
 
 const Repo: Command = {
   data: new SlashCommandBuilder()

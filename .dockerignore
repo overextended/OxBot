@@ -8,3 +8,4 @@ build
 README.md
 Dockerfile
 template.env
+prisma/database.db

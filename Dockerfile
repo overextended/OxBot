@@ -10,4 +10,6 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
+RUN npx prisma generate
+
 CMD [ "pnpm", "start:production" ]

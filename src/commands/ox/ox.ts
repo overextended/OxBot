@@ -1,5 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
-import { Command } from '../interfaces/command';
+import { Command } from '../../interfaces/command';
 
 const Ox: Command = {
   data: new SlashCommandBuilder().setName('ox').setDescription('About Overextended'),

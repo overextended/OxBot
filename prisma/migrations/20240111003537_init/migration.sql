@@ -1,0 +1,18 @@
+-- CreateTable
+CREATE TABLE "Warn" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "reason" TEXT NOT NULL,
+    "issuerId" TEXT NOT NULL,
+    "targetId" TEXT NOT NULL,
+    "issuedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CreateTable
+CREATE TABLE "Ban" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "reason" TEXT NOT NULL,
+    "issuerId" TEXT NOT NULL,
+    "targetId" TEXT NOT NULL,
+    "issuedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "releaseDate" DATETIME NOT NULL
+);

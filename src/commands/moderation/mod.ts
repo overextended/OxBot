@@ -1,5 +1,5 @@
 import { GuildMember, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
-import { Command } from '../interfaces/command';
+import { Command } from '../../interfaces/command';
 
 const Mod: Command = {
   data: new SlashCommandBuilder()

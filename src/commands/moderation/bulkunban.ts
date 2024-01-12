@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
-import { Command } from '../interfaces/command';
+import { Command } from '../../interfaces/command';
 
 const BulkUnban: Command = {
   data: new SlashCommandBuilder()
