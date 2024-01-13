@@ -10,6 +10,6 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npx prisma generate
+RUN npx prisma migrate dev --name oxbot
 
 CMD [ "pnpm", "start:production" ]
