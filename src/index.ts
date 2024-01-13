@@ -8,6 +8,8 @@ import { onMemberRemove } from './events/onMemberRemove';
 import { onMessageDelete } from './events/onMessageDelete';
 import { onMessageCreate } from './events/onMessageCreate';
 import { onMessageTroll } from './troll/onMessageTroll';
+import { onMemberJoin } from './events/onMemberJoin';
+import { onMemberLeave } from './events/onMemberLeave';
 
 export const Bot = new Client({
   intents: [
@@ -37,6 +39,8 @@ Bot.on(Events.GuildAuditLogEntryCreate, async (auditLogEntry, guild) => {
   }
 });
 
+Bot.on('guildMemberAdd', async (member) => await onMemberJoin(member));
+Bot.on('guildMemberRemove', async (member) => await onMemberLeave(member));
 Bot.on('interactionCreate', async (interaction) => await onInteraction(interaction));
 Bot.on('messageDelete', async (message) => await onMessageDelete(message));
 Bot.on('messageCreate', async (message) => await onMessageCreate(message));
