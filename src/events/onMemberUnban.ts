@@ -10,10 +10,8 @@ export const onMemberUnban = async (auditLogEntry: GuildAuditLogsEntry, guild: G
     return console.log('Executor ID or target ID is missing from the audit log entry.');
   }
 
-  // Ensure the executor is cached.
   const executor = await guild.client.users.fetch(auditLogEntry.executorId);
 
-  // Ensure the unbanned guild member is cached.
   const targetUser = await guild.client.users.fetch(auditLogEntry.targetId);
 
   if (!executor || !targetUser) {
