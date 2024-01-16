@@ -48,7 +48,7 @@ const Warn: Command = {
         },
       });
 
-      const timeoutDuration = targetUser.warns % 2 === 0 ? calculateTimeoutDuration(targetUser.warns) : null;
+      const timeoutDuration = calculateTimeoutDuration(targetUser.warns);
       handleMemberWarn(
         userOption,
         interaction.user,
@@ -58,19 +58,14 @@ const Warn: Command = {
         interaction.guild
       );
 
-      if (targetUser.warns % 2 === 0) {
-        const member = await interaction.guild.members.fetch(userOption.id);
-        await member.timeout(timeoutDuration, `Accumulated Warns: ${targetUser.warns}`);
-        await sendWarningDM(userOption, reasonOptionRaw, timeoutDuration);
+      const member = await interaction.guild.members.fetch(userOption.id);
+      await member.timeout(timeoutDuration, `Accumulated Warns: ${targetUser.warns}`);
+      await sendWarningDM(userOption, reasonOptionRaw, timeoutDuration);
 
-        await interaction.reply({
-          content: `Warned <@${userOption.id}> and applied timeout. Reason: ${reasonOptionRaw}`,
-          ephemeral: true,
-        });
-      } else {
-        await sendWarningDM(userOption, reasonOptionRaw, null);
-        await interaction.reply({ content: `Warned <@${userOption.id}>. Reason: ${reasonOptionRaw}`, ephemeral: true });
-      }
+      await interaction.reply({
+        content: `Warned <@${userOption.id}> and applied timeout of ${timeoutDuration}. Reason: ${reasonOptionRaw}`,
+        ephemeral: true,
+      });
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'An error occurred while processing the warning.', ephemeral: true });
