@@ -9,7 +9,8 @@ export const onMemberLeave = async (member: GuildMember | PartialGuildMember) =>
     try {
       member = await member.fetch();
     } catch {
-      return channel.send(`error fetching partial member <@${member.id}>`);
+      await channel.send(`error fetching partial member <@${member.id}>`);
+      return;
     }
   }
 
