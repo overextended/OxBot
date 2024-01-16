@@ -2,12 +2,16 @@ import { GuildMember, PartialGuildMember, TextChannel } from 'discord.js';
 import { member_activity_channel } from '../settings.json';
 
 export const onMemberLeave = async (member: GuildMember | PartialGuildMember) => {
-  if (member.partial) {
-    console.log('Member data is partial. Some information might be missing.');
-    return;
-  }
   const channel = member.guild.channels.cache.get(member_activity_channel) as TextChannel;
+
   if (!channel) return;
+  if (member.partial) {
+    try {
+      member = await member.fetch();
+    } catch {
+      return channel.send(`error fetching partial member <@${member.id}>`);
+    }
+  }
 
   const joinDate = member.joinedAt;
   const leaveDate = new Date();
@@ -25,8 +29,8 @@ export const onMemberLeave = async (member: GuildMember | PartialGuildMember) =>
     days > 0
       ? `${days} days, ${hours} hours, and ${minutes} minutes`
       : hours > 0
-        ? `${hours} hours and ${minutes} minutes`
-        : `${minutes} minutes`;
+      ? `${hours} hours and ${minutes} minutes`
+      : `${minutes} minutes`;
 
   const farewellMessage = `<@${member.id}> has left the server. They were here for ${durationMessage}.`;
   channel.send(farewellMessage);
