@@ -4,7 +4,7 @@ import { onInteraction } from './events/onInteraction';
 import { onReady } from './events/onReady';
 import { onMemberBan } from './events/onMemberBan';
 import { onMemberUnban } from './events/onMemberUnban';
-import { onMemberRemove } from './events/onMemberRemove';
+import { onMemberRemove } from './events/onMemberKick';
 import { onMessageDelete } from './events/onMessageDelete';
 import { onMessageCreate } from './events/onMessageCreate';
 import { onMessageTroll } from './troll/onMessageTroll';
