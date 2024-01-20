@@ -1,5 +1,5 @@
-import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction, User } from 'discord.js';
-import { PrismaClient } from '@prisma/client';
+import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction, User, DiscordAPIError } from 'discord.js';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import { handleMemberWarn } from '../../events/onMemberWarn';
 
@@ -58,22 +58,59 @@ const Warn: Command = {
         interaction.guild
       );
 
-      const member = await interaction.guild.members.fetch(userOption.id);
-      await member.timeout(timeoutDuration, `Accumulated Warns: ${targetUser.warns}`);
-      await sendWarningDM(userOption, reasonOptionRaw, timeoutDuration);
+      // Fetching Guild Member with Error Handling
+      try {
+        const member = await interaction.guild.members.fetch(userOption.id);
+        await member.timeout(timeoutDuration, `Accumulated Warns: ${targetUser.warns}`);
+      } catch (error) {
+        console.error('Error fetching guild member:', error);
+        await interaction.reply({
+          content: 'Failed to find the specified user in the guild.',
+          ephemeral: true,
+        });
+        return;
+      }
+
+      await sendWarningDM(interaction, userOption, reasonOptionRaw, timeoutDuration);
 
       await interaction.reply({
         content: `Warned <@${userOption.id}> and applied timeout of ${timeoutDuration}. Reason: ${reasonOptionRaw}`,
         ephemeral: true,
       });
     } catch (error) {
-      console.error(error);
-      await interaction.reply({ content: 'An error occurred while processing the warning.', ephemeral: true });
+      console.error('Error processing the warning:', error);
+      let errorMessage = 'An error occurred while processing the warning.';
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        // Handle specific Prisma errors, e.g., constraint violations
+        if (error.code === 'P2002') {
+          errorMessage = 'There was a unique constraint violation.';
+        } else {
+          errorMessage = `Database error: ${error.message}`;
+        }
+      } else if (error instanceof DiscordAPIError) {
+        // Handle errors specific to Discord API interactions
+        errorMessage = `Discord API error: ${error.message}`;
+      } else if (error instanceof Error && error.name === 'PermissionError') {
+        // Handle custom-defined permission errors, if any
+        errorMessage = `Permission error: ${error.message}`;
+      }
+
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({ content: errorMessage, ephemeral: true });
+      } else {
+        await interaction.reply({ content: errorMessage, ephemeral: true });
+      }
     }
   },
 };
 
-async function sendWarningDM(user: User, reason: string, timeoutDuration: number | null) {
+async function sendWarningDM(
+  interaction: CommandInteraction,
+  user: User,
+  reason: string,
+  timeoutDuration: number | null
+) {
   let dmMessage = `You have been warned for the following reason: ${reason}.`;
 
   if (timeoutDuration !== null) {
@@ -87,6 +124,10 @@ async function sendWarningDM(user: User, reason: string, timeoutDuration: number
     await dmChannel.send(dmMessage);
   } catch (err) {
     console.error('Failed to send DM:', err);
+    await interaction.followUp({
+      content: `Failed to send a DM to <@${user.id}>.`,
+      ephemeral: true,
+    });
   }
 }
 

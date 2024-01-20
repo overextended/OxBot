@@ -22,6 +22,18 @@ const Purge: Command = {
         .addIntegerOption((option) =>
           option.setName('count').setDescription('Number of messages to delete').setRequired(true)
         )
+    )
+
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName('after')
+        .setDescription('Delete messages after a specific message ID')
+        .addStringOption((option) =>
+          option.setName('messageid').setDescription('The ID of the message to start deleting after').setRequired(true)
+        )
+        .addIntegerOption((option) =>
+          option.setName('count').setDescription('Number of messages to delete').setRequired(false)
+        )
     ),
 
   async run(interaction: CommandInteraction) {
@@ -67,6 +79,44 @@ const Purge: Command = {
         });
       }
     }
+
+    if (subcommand === 'after') {
+      const messageIdOption = interaction.options.get('messageid');
+      const countOption = interaction.options.get('count');
+
+      if (!messageIdOption || typeof messageIdOption.value !== 'string') {
+        await interaction.reply({ content: 'Invalid message ID.', ephemeral: true });
+        return;
+      }
+
+      const messageId = messageIdOption.value;
+      const count = countOption && typeof countOption.value === 'number' ? countOption.value : 1;
+
+      try {
+        const messages = await interaction.channel.messages.fetch({ limit: 100 });
+        const messagesArray = Array.from(messages.values());
+        const startIndex = messagesArray.findIndex((m) => m.id === messageId);
+
+        if (startIndex === -1) {
+          await interaction.reply({ content: 'Message ID not found in the last 100 messages.', ephemeral: true });
+          return;
+        }
+
+        const messagesAfterSpecified = messagesArray.slice(0, startIndex).reverse();
+        const messagesToDelete =
+          messagesAfterSpecified.length > count ? messagesAfterSpecified.slice(0, count) : messagesAfterSpecified;
+
+        await interaction.channel.bulkDelete(messagesToDelete, true);
+        await interaction.reply({
+          content: `Successfully deleted ${messagesToDelete.length} messages after the specified message.`,
+          ephemeral: true,
+        });
+      } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'An error occurred while deleting messages.', ephemeral: true });
+      }
+    }
+
   },
 };
 

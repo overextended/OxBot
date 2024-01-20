@@ -9,3 +9,4 @@ README.md
 Dockerfile
 template.env
 prisma/database.db
+prisma/database.db-journal
