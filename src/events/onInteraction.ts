@@ -8,7 +8,7 @@ export const onInteraction = async (interaction: Interaction) => {
   const command = commands.get(interaction.commandName);
   if (!command) return;
 
-  if (interaction.commandName === 'mod' || interaction.commandName === 'bulkunban') {
+  if (interaction.commandName === 'kick' || interaction.commandName === 'bulkunban') {
     const logChannel = interaction.guild?.channels.cache.get(log_channel) as TextChannel;
     logChannel && logChannel.send(`${interaction.user.tag} used **${interaction.commandName}**!`);
   }
