@@ -5,11 +5,9 @@ const Kick: Command = {
   data: new SlashCommandBuilder()
     .setName('kick')
     .setDescription('Kick a user from the server')
-    .addUserOption(option =>
-      option.setName('user').setDescription('User to kick').setRequired(true))
-    .addStringOption(option =>
-      option.setName('reason').setDescription('Reason for kicking')),
-  
+    .addUserOption((option) => option.setName('user').setDescription('User to kick').setRequired(true))
+    .addStringOption((option) => option.setName('reason').setDescription('Reason for kicking')),
+
   async run(interaction: CommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a server.', ephemeral: true });
