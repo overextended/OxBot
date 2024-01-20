@@ -1,7 +1,7 @@
 import { Interaction, EmbedBuilder, TextChannel } from 'discord.js';
 import { log_channel } from '../settings.json';
 
-const commandWhitelist = new Set(['docs', 'issue', 'ox', 'ping', 'repo', 'guild', 'whois']);
+const commandWhitelist = new Set(['docs', 'issue', 'ox', 'ping', 'repo', 'guild', 'whois', 'warn']);
 
 function getChannelMention(channel: TextChannel | null) {
   return channel ? `<#${channel.id}>` : 'Unknown Channel';
