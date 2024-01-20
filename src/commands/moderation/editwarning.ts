@@ -8,14 +8,12 @@ const EditWarning: Command = {
   data: new SlashCommandBuilder()
     .setName('editwarning')
     .setDescription('Edit the reason for a given warning')
-    .addIntegerOption(option =>
-      option.setName('id')
-        .setDescription('The ID of the warning to edit')
-        .setRequired(true))
-    .addStringOption(option =>
-      option.setName('newmessage')
-        .setDescription('The new warning message')
-        .setRequired(true)),
+    .addIntegerOption((option) =>
+      option.setName('id').setDescription('The ID of the warning to edit').setRequired(true)
+    )
+    .addStringOption((option) =>
+      option.setName('newmessage').setDescription('The new warning message').setRequired(true)
+    ),
 
   async run(interaction: CommandInteraction) {
     if (!interaction.guild) {
