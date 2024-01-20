@@ -116,7 +116,6 @@ const Purge: Command = {
         await interaction.reply({ content: 'An error occurred while deleting messages.', ephemeral: true });
       }
     }
-
   },
 };
 
