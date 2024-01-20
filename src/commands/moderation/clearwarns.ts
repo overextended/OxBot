@@ -43,6 +43,12 @@ const ClearWarn: Command = {
         // Clear all warnings
         await prisma.warn.deleteMany({ where: { targetId: userOption.id } });
 
+        // Reset the warns count in User model
+        await prisma.user.update({
+          where: { id: userOption.id },
+          data: { warns: 0 },
+        });
+
         // Remove timeout if present
         if (member.communicationDisabledUntilTimestamp && member.communicationDisabledUntilTimestamp > Date.now()) {
           await member.timeout(null);

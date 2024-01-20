@@ -4,12 +4,13 @@ import { onInteraction } from './events/onInteraction';
 import { onReady } from './events/onReady';
 import { onMemberBan } from './events/onMemberBan';
 import { onMemberUnban } from './events/onMemberUnban';
-import { onMemberRemove } from './events/onMemberRemove';
+import { onMemberRemove } from './events/onMemberKick';
 import { onMessageDelete } from './events/onMessageDelete';
 import { onMessageCreate } from './events/onMessageCreate';
 import { onMessageTroll } from './troll/onMessageTroll';
 import { onMemberJoin } from './events/onMemberJoin';
 import { onMemberLeave } from './events/onMemberLeave';
+import { onMessageDeleteBulk } from './events/onPurge';
 import { onSlashCommand } from './events/onSlashCommand';
 
 export const Bot = new Client({
@@ -45,6 +46,7 @@ Bot.on('guildMemberRemove', async (member) => await onMemberLeave(member));
 Bot.on('messageDelete', async (message) => await onMessageDelete(message));
 Bot.on('messageCreate', async (message) => await onMessageCreate(message));
 Bot.on('messageCreate', async (message) => await onMessageTroll(message));
+Bot.on('messageDeleteBulk', onMessageDeleteBulk);
 Bot.on('interactionCreate', async (interaction) => {
   await onInteraction(interaction);
   await onSlashCommand(interaction);
