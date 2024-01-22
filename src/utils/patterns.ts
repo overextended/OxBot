@@ -88,6 +88,12 @@ export const positivePatterns = [
   /(\bconfused\s+about\b)/i, // Confused about
   /(\blooking\s+for\s+information\s+on\b)/i, // Looking for information on
   /(\bseeking\s+help\s+with\b)/i, // Seeking help with
+  /(\bdoes\s+anyone\s+have\b)/i, // does anyone have
+  /(\bcan\s+u\s+send\b)/i, // can u send
+  /(\bcan\s+you\s+send\b)/i, // can you send
+  /(\bis\s+it\s+possible\b)/i, // is it possible
+  /(\bI\s+was\s+wondering\b)/i, // I was wondering
+  /(\bwhere\s+can\b)/i, // where can
 ];
 
 export const negativePatterns = [
