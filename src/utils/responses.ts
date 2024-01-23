@@ -6,9 +6,9 @@ interface ChannelResponses {
 
 export const guidelineResponses: ChannelResponses = {
   // general
-  '813030955598086177': [
-    `Read the channel description, dip shit.`,
-    `I bet someone would be more willing to help you if you were asking in a support channel.`,
+  '1193439560865157222': [
+    `Read the channel description, dip shit. ${guidelines}`,
+    `I bet someone would be more willing to help you if you were asking in a support channel. ${guidelines}`,
     `Does this look like the support channel? Read ${guidelines}.`,
     `For Support Read: ${guidelines}`,
     `I wonder what this is for? ${guidelines}`,
@@ -36,9 +36,9 @@ export const guidelineResponses: ChannelResponses = {
 };
 
 export const resourceResponses: string[] = [
-  'Before asking questions about a resource, make sure you read the [documentation](https://overextended.dev/).',
-  '[RTFM!](https://overextended.dev/)',
-  'You might find what you\'re looking for in the [documentation](https://overextended.dev/).',
+  `Before asking questions about a resource, make sure you read the [documentation](https://overextended.dev/) and also read ${guidelines}.`,
+  `[RTFM!](https://overextended.dev/) and also read ${guidelines}.`,
+  `You might find what you\'re looking for in the [documentation](https://overextended.dev/), if not read ${guidelines}.`,
 ];
 
 export const cooldownResponses: string[] = [

@@ -96,35 +96,6 @@ export const positivePatterns = [
   /(\bwhere\s+can\b)/i, // where can
 ];
 
-export const negativePatterns = [
-  /(\bdon'?t\s+need\s+help\b|\bno\s+help\s+needed\b)/i, // don't need help, dont need help, no help needed
-  /(\bwas\s+helping\b)/i, // was helping
-  /(\bnot\s+looking\s+for\s+help\b)/i, // not looking for help
-  /(\bno\s+help\s+required\b)/i, // no help required
-  /(\bcan\s+help\b.*\bwithout\b)/i, // can help without
-  /(\bhave\s+solved\b|\bhave\s+resolved\b)/i, // have solved, have resolved
-  /(\bfigured\s+it\s+out\b)/i, // figured it out
-  /(\bdon'?t\s+need\s+assistance\b)/i, // don't need assistance, dont need assistance
-  /(\bno\s+assistance\s+required\b)/i, // no assistance required
-  /(\bthanks.*\bfor\s+the\s+help\b)/i, // thanks for the help
-  /(\bjust\s+helped\b)/i, // just helped
-  /(\balready\s+received\s+help\b)/i, // already received help
-  /(\bhelping\s+myself\b)/i, // helping myself
-  /(\bI\s+can\s+manage\b)/i, // I can manage
-  /(\bno\s+further\s+help\s+needed\b)/i, // no further help needed
-  /(\bhelp\s+is\s+not\s+required\b)/i, // help is not required
-  /(\bproblem\s+solved\b)/i, // problem solved
-  /(\bissue\s+resolved\b)/i, // issue resolved
-  /(\bI've\s+got\s+this\b)/i, // I've got this
-  /(\bno\s+more\s+help\s+needed\b)/i, // no more help needed
-  /(\bhandle\s+it\s+myself\b)/i, // handle it myself
-  /(\bno\s+need\s+for\s+help\b)/i, // no need for help
-  /(\bI\s+don'?t\s+require\s+help\b)/i, // I don't require help, I dont require help
-  /(\bself\s+sufficient\b)/i, // self sufficient
-  /(\bno\s+trouble\s+here\b)/i, // no trouble here
-  /(\bmanaged\s+on\s+my\s+own\b)/i, // managed on my own
-];
-
 export const resourcePatterns = [
   /ox[ _]?inventory/i,    // Matches "ox inventory", "oxinventory", "ox_inventory"
   /ox[ _]?lib/i,          // Matches "ox lib", "oxlib", "ox_lib"

@@ -1,72 +1,87 @@
-import { Message } from 'discord.js';
+import { Message, EmbedBuilder, TextChannel } from 'discord.js';
 import { ignoredRoles, whitelistedChannels } from '../constants';
-import { positivePatterns, negativePatterns, resourcePatterns } from '../utils/patterns';
+import { positivePatterns, resourcePatterns } from '../utils/patterns';
 import { guidelineResponses, resourceResponses, cooldownResponses } from '../utils/responses';
+import { Bot } from '..';
+import { log_channel } from '../settings.json';
 
-const userResponseCooldown = new Map<string, { count: number; lastResponseTime: number }>();
+interface UserCooldownData {
+  lastResponseTime: number;
+  messageCount: number;
+  sentLogMessage: boolean;
+}
+
+const userResponseCooldown = new Map<string, UserCooldownData>();
+const userCooldownPeriod = 15 * 60 * 1000; // 15 minutes
+const globalCooldownPeriod = 10 * 1000; // 10 seconds
+let lastGlobalResponseTime = 0;
 
 export const onMessageCreate = async (message: Message) => {
-  // Initial checks
   if (message.author.bot || whitelistedChannels.includes(message.channelId)) return;
+
   const member = message.member;
   if (!member || member.roles.cache.some((role) => ignoredRoles.includes(role.id))) return;
 
-  const lowerCaseMessage = message.content.toLowerCase();
-  const userId = message.author.id;
   const now = Date.now();
-  const cooldownPeriod = 15 * 60 * 1000;
+  const userId = message.author.id;
+  const lowerCaseMessage = message.content.toLowerCase();
 
-  // Cooldown logic
-  if (userResponseCooldown.has(userId)) {
-    const userData = userResponseCooldown.get(userId);
-    if (userData && now - userData.lastResponseTime < cooldownPeriod) {
-      if (userData.count >= 3) {
-        return; // User is in cooldown, do not respond
-      }
-    } else {
-      // Reset count if cooldown has expired
-      userResponseCooldown.set(userId, { count: 0, lastResponseTime: now });
+  if (!userResponseCooldown.has(userId)) {
+    userResponseCooldown.set(userId, { lastResponseTime: 0, messageCount: 0, sentLogMessage: false });
+  }
+  const userData = userResponseCooldown.get(userId)!;
+
+  if (now - lastGlobalResponseTime < globalCooldownPeriod) {
+    return;
+  }
+
+  if (userData && now - userData.lastResponseTime < userCooldownPeriod) {
+    if (!userData.sentLogMessage) {
+      sendCooldownLog(message, userData.lastResponseTime);
+      userData.sentLogMessage = true;
     }
+    return;
   } else {
-    userResponseCooldown.set(userId, { count: 0, lastResponseTime: now });
+    userData.sentLogMessage = false;
   }
 
-  // Negative pattern check
-  const isNegativeMatch = negativePatterns.some(pattern => pattern.test(lowerCaseMessage));
-  if (isNegativeMatch) return; // Stop processing if a negative pattern is matched
+  const isResourceMatch = resourcePatterns.some((pattern) => pattern.test(lowerCaseMessage));
+  const isPositiveMatch = positivePatterns.some((pattern) => pattern.test(lowerCaseMessage));
 
-  // Matching patterns
-  const isResourceMatch = resourcePatterns.some(pattern => pattern.test(lowerCaseMessage));
-  const isPositiveMatch = positivePatterns.some(pattern => pattern.test(lowerCaseMessage));
-
-  // Send replies and update cooldown
-  const sendReplyAndUpdateCooldown = async (response: string) => {
-    await message.reply(response);
-
-    const userData = userResponseCooldown.get(userId);
-    if (userData) {
-      userData.count++;
+  if (isResourceMatch || isPositiveMatch) {
+    if (userData.messageCount < 2) {
+      const responseArray = isResourceMatch ? resourceResponses : guidelineResponses[message.channelId] || [];
+      const randomResponse = responseArray[Math.floor(Math.random() * responseArray.length)];
+      await message.reply(randomResponse);
+      userData.messageCount++;
+    } else {
+      const randomCooldownResponse = cooldownResponses[Math.floor(Math.random() * cooldownResponses.length)];
+      await message.reply(randomCooldownResponse);
       userData.lastResponseTime = now;
-
-      if (userData.count === 3) {
-        const randomIndex = Math.floor(Math.random() * cooldownResponses.length);
-        const randomCooldownMessage = cooldownResponses[randomIndex];
-        await message.reply(randomCooldownMessage);
-      }
+      userData.messageCount = 0;
     }
-  };
-
-  // Respond based on matches
-  if (isResourceMatch) {
-    const randomResourceResponse = resourceResponses[Math.floor(Math.random() * resourceResponses.length)];
-    await sendReplyAndUpdateCooldown(randomResourceResponse);
-  }
-
-  if (isPositiveMatch && message.channelId in guidelineResponses) {
-    const responseMessages = guidelineResponses[message.channelId];
-    if (responseMessages) {
-      const randomResponse = responseMessages[Math.floor(Math.random() * responseMessages.length)];
-      await sendReplyAndUpdateCooldown(randomResponse);
-    }
+    lastGlobalResponseTime = now;
   }
 };
+
+async function sendCooldownLog(message: Message, lastResponseTime: number) {
+  const remainingTime = userCooldownPeriod - (Date.now() - lastResponseTime);
+  const minutes = Math.floor(remainingTime / 60000);
+  const seconds = ((remainingTime % 60000) / 1000).toFixed(0);
+
+  const embed = new EmbedBuilder()
+    .setColor('#ff0000')
+    .setTitle(`${message.author.tag} is currently being ignored by OxBot`)
+    .setDescription(`Ignored for ${minutes} minutes, ${seconds} seconds`)
+    .setTimestamp()
+    .setFooter({ text: `User ID: ${message.author.id}` });
+
+  const logChannel = Bot.channels.cache.get(log_channel) as TextChannel;
+  if (logChannel) {
+    try {
+      await logChannel.send({ embeds: [embed] });
+    } catch (error) {
+      console.error('Error sending cooldown log:', error);
+    }
+  }
+}
