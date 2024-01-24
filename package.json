@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "@prisma/client": "^5.8.0",
+    "axios": "^1.6.5",
     "discord.js": "^14.14.1",
     "dotenv": "^16.3.1",
-    "node-fetch": "2",
     "prisma": "^5.8.0"
   }
 }

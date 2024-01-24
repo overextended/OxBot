@@ -1,7 +1,26 @@
 export const GithubUrl = 'https://github.com/overextended';
 export const GithubApi = 'https://api.github.com/repos/overextended';
 export const DocsUrl = 'https://overextended.dev';
-export const Resources = ['ox_lib', 'ox_inventory', 'oxmysql', 'ox_core', 'ox_fuel', 'ox_target', 'ox_doorlock'];
+export const Resources = [
+  'ox_lib', 
+  'ox_inventory', 
+  'oxmysql', 
+  'ox_core', 
+  'ox_fuel', 
+  'ox_target', 
+  'ox_doorlock', 
+  'ox_types', 
+  'ox_mdt', 
+  'cfxlua-vscode', 
+  'ox_vehicledealer', 
+  'ox_banking',
+  'ox_appearance',
+  'ox_police',
+  'ox_commands',
+  'OxBot',
+  'fivem-typescript-boilerplate',
+  'fivem-lls-addon',
+];
 
 export const ResourceChoices = (() => {
   const arr: { name: string; value: string }[] = new Array(Resources.length);

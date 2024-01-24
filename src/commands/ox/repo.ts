@@ -1,7 +1,7 @@
 import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../interfaces/command';
-import fetch from 'node-fetch';
 import { GithubApi, GithubUrl, ResourceChoices } from '../../constants';
+import axios from 'axios';
 
 const Repo: Command = {
   data: new SlashCommandBuilder()
@@ -21,26 +21,28 @@ const Repo: Command = {
 };
 
 const newEmbed = async (interaction: CommandInteraction, repository: string) => {
-  const response = await fetch(`${GithubApi}/${repository}`);
-  if (response.status !== 200) {
-    return interaction.reply('No such Overextended repository found.');
+  try {
+    const response = await axios.get(`${GithubApi}/${repository}`);
+
+    const data = response.data;
+
+    const repoEmbed = new EmbedBuilder()
+      .setColor('#0099ff')
+      .setTitle(data.name)
+      .setDescription(data.description)
+      .setThumbnail('https://i.imgur.com/Rp4xZiU.png')
+      .addFields(
+        { name: 'Watchers', value: data.subscribers_count.toString(), inline: true },
+        { name: 'Forks', value: data.forks.toString(), inline: true },
+        { name: 'Stars', value: data.stargazers_count.toString(), inline: true }
+      )
+      .setURL(`${GithubUrl}/${repository}`);
+
+    return interaction.reply({ embeds: [repoEmbed] });
+  } catch (error) {
+    console.error('Error fetching repository data:', error);
+    return interaction.reply('An error occurred while fetching repository data.');
   }
-
-  const data = await response.json();
-
-  const repoEmbed = new EmbedBuilder()
-    .setColor('#0099ff')
-    .setTitle(data.name)
-    .setDescription(data.description)
-    .setThumbnail('https://i.imgur.com/Rp4xZiU.png')
-    .addFields(
-      { name: 'Watchers', value: data.subscribers_count.toString(), inline: true },
-      { name: 'Forks', value: data.forks.toString(), inline: true },
-      { name: 'Stars', value: data.stargazers_count.toString(), inline: true }
-    )
-    .setURL(`${GithubUrl}/${repository}`);
-
-  return interaction.reply({ embeds: [repoEmbed] });
 };
 
 export default Repo;
