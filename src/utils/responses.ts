@@ -6,7 +6,7 @@ interface ChannelResponses {
 
 export const guidelineResponses: ChannelResponses = {
   // general
-  '1193439560865157222': [
+  '813030955598086177': [
     `Read the channel description, dip shit. ${guidelines}`,
     `I bet someone would be more willing to help you if you were asking in a support channel. ${guidelines}`,
     `Does this look like the support channel? Read ${guidelines}.`,
