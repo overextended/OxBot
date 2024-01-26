@@ -94,14 +94,31 @@ export const positivePatterns = [
   /(\bis\s+it\s+possible\b)/i, // is it possible
   /(\bI\s+was\s+wondering\b)/i, // I was wondering
   /(\bwhere\s+can\b)/i, // where can
+  /(\btried\s+to\s+post\b)/i, // tried to post
+  /(\bi\s+have\s+(a\s+)?question\b)/i, // i have question, i have a question
+  /(\bconvert\s+from\b)/i, // convert from
+  /(\bqb\s+inventory\b)/i, // qb inventory
+  /(\bhello\s+guys\b)/i, // Hello guys
+  /(\bqbcore\s+server\b)/i, // qbcore server
+  /(\bconverted\s+to\b)/i, // converted to
+  /(\bhow\s+to\s+convert\b)/i, // how to convert
+  /(\bhelp\s+me\s+convert\b)/i, // help me convert
+  /(\banyone\s+has\b)/i, // anyone has
+  /(\bpossible\s+to\s+convert\b)/i, // possible to convert
+  /(\bhow\s+can\s+we\s+get\b)/i, // how can we get
+  /(\bi\s+want\s+to\s+make\s+a\s+script\b)/i, // i want to make a script
+  /(\bwhere\s+can\s+i\s+find\b)/i, // where can i find
+  /(\bhelp\s+with\s+script\b)/i, // help with script
+  /(\box\s+script\b)/i, // ox script
+  /(\bto\s+fix\s+this\b)/i, // to fix this
 ];
 
 export const resourcePatterns = [
-  /ox[ _]?inventory/i,    // Matches "ox inventory", "oxinventory", "ox_inventory"
-  /ox[ _]?lib/i,          // Matches "ox lib", "oxlib", "ox_lib"
-  /ox[ _]?core/i,         // Matches "ox core", "oxcore", "ox_core"
-  /ox[ _]?doorlock/i,     // Matches "ox doorlock", "oxdoorlock", "ox_doorlock"
-  /ox[ _]?target/i,       // Matches "ox target", "oxtarget", "ox_target"
-  /ox[ _]?fuel/i,         // Matches "ox fuel", "oxfuel", "ox_fuel"
-  /oxmysql/i              // Matches "oxmysql"
+  /ox[ _]?inventory/i, // Matches "ox inventory", "oxinventory", "ox_inventory"
+  /ox[ _]?lib/i, // Matches "ox lib", "oxlib", "ox_lib"
+  /ox[ _]?core/i, // Matches "ox core", "oxcore", "ox_core"
+  /ox[ _]?doorlock/i, // Matches "ox doorlock", "oxdoorlock", "ox_doorlock"
+  /ox[ _]?target/i, // Matches "ox target", "oxtarget", "ox_target"
+  /ox[ _]?fuel/i, // Matches "ox fuel", "oxfuel", "ox_fuel"
+  /oxmysql/i, // Matches "oxmysql"
 ];

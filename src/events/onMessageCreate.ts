@@ -1,7 +1,7 @@
 import { Message, EmbedBuilder, TextChannel } from 'discord.js';
 import { ignoredRoles, whitelistedChannels } from '../constants';
 import { positivePatterns, resourcePatterns } from '../utils/patterns';
-import { guidelineResponses, resourceResponses, cooldownResponses } from '../utils/responses';
+import { guidelineResponses, resourceResponses, cooldownResponses } from '../handlers/botResponsesHandler';
 import { Bot } from '..';
 import { log_channel } from '../settings.json';
 
@@ -26,23 +26,15 @@ export const onMessageCreate = async (message: Message) => {
   const userId = message.author.id;
   const lowerCaseMessage = message.content.toLowerCase();
 
-  if (!userResponseCooldown.has(userId)) {
-    userResponseCooldown.set(userId, { lastResponseTime: 0, messageCount: 0, sentLogMessage: false });
-  }
-  const userData = userResponseCooldown.get(userId)!;
-
   if (now - lastGlobalResponseTime < globalCooldownPeriod) {
     return;
   }
 
-  if (userData && now - userData.lastResponseTime < userCooldownPeriod) {
-    if (!userData.sentLogMessage) {
-      sendCooldownLog(message, userData.lastResponseTime);
-      userData.sentLogMessage = true;
-    }
+  const userData = userResponseCooldown.get(userId) || { lastResponseTime: 0, messageCount: 0, sentLogMessage: false };
+  userResponseCooldown.set(userId, userData);
+
+  if (userData.sentLogMessage && now - userData.lastResponseTime < userCooldownPeriod) {
     return;
-  } else {
-    userData.sentLogMessage = false;
   }
 
   const isResourceMatch = resourcePatterns.some((pattern) => pattern.test(lowerCaseMessage));
@@ -50,17 +42,21 @@ export const onMessageCreate = async (message: Message) => {
 
   if (isResourceMatch || isPositiveMatch) {
     if (userData.messageCount < 2) {
-      const responseArray = isResourceMatch ? resourceResponses : guidelineResponses[message.channelId] || [];
+      const responseArray = isResourceMatch
+        ? resourceResponses
+        : guidelineResponses[message.channelId] || guidelineResponses['general'];
       const randomResponse = responseArray[Math.floor(Math.random() * responseArray.length)];
       await message.reply(randomResponse);
+      lastGlobalResponseTime = now;
       userData.messageCount++;
     } else {
       const randomCooldownResponse = cooldownResponses[Math.floor(Math.random() * cooldownResponses.length)];
       await message.reply(randomCooldownResponse);
       userData.lastResponseTime = now;
       userData.messageCount = 0;
+      userData.sentLogMessage = true;
+      sendCooldownLog(message, userData.lastResponseTime);
     }
-    lastGlobalResponseTime = now;
   }
 };
 
@@ -77,11 +73,12 @@ async function sendCooldownLog(message: Message, lastResponseTime: number) {
     .setFooter({ text: `User ID: ${message.author.id}` });
 
   const logChannel = Bot.channels.cache.get(log_channel) as TextChannel;
+
   if (logChannel) {
     try {
       await logChannel.send({ embeds: [embed] });
     } catch (error) {
-      console.error('Error sending cooldown log:', error);
+      // Error handling here when I need it
     }
   }
 }
