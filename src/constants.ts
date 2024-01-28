@@ -2,17 +2,17 @@ export const GithubUrl = 'https://github.com/overextended';
 export const GithubApi = 'https://api.github.com/repos/overextended';
 export const DocsUrl = 'https://overextended.dev';
 export const Resources = [
-  'ox_lib', 
-  'ox_inventory', 
-  'oxmysql', 
-  'ox_core', 
-  'ox_fuel', 
-  'ox_target', 
-  'ox_doorlock', 
-  'ox_types', 
-  'ox_mdt', 
-  'cfxlua-vscode', 
-  'ox_vehicledealer', 
+  'ox_lib',
+  'ox_inventory',
+  'oxmysql',
+  'ox_core',
+  'ox_fuel',
+  'ox_target',
+  'ox_doorlock',
+  'ox_types',
+  'ox_mdt',
+  'cfxlua-vscode',
+  'ox_vehicledealer',
   'ox_banking',
   'ox_appearance',
   'ox_police',
@@ -54,3 +54,12 @@ export const whitelistedChannels = [
   '829915571394052176', // coffee-club
   '906294817678590012', // nerd-club
 ];
+
+// channel IDs for botResponsesHandler.ts
+export const ChannelIDs = {
+  general: '813030955598086177', // ox general channel 813030955598086177
+  music: '871124377129848843', // ox music channel 871124377129848843
+  shitposting: '844240881283366962', // ox shitposting channel 844240881283366962
+  gaming: '894221760315162754', // ox gaming channel 894221760315162754
+  ox_core: '951683419769831465', // ox_core channel 951683419769831465
+};
