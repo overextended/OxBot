@@ -2,13 +2,10 @@
   "guidelineResponses": {
     "general": [
       "Read the channel description, {guidelines}",
-      "I bet someone would be more willing to help you if you were asking in a support channel. {guidelines}",
-      "Does this look like the support channel? Read {guidelines}.",
       "For Support Read: {guidelines}",
       "Have you had a chance to review our {guidelines} channel?",
       "To help keep the discord organized we have specific channels for specific things, read {guidelines}.",
-      "It seems like you might have missed our {guidelines}.",
-      "Thanks for letting us know. We agree there is an issue and we're looking into it."
+      "It seems like you might have missed our {guidelines}."
     ],
     "music": [
       "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTQyd2V2ZWR0Y2twN2JqZnh5ZTRpOXY5dmxtbmQ3dmNqb2Q4bTNuOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/yetxv6NWi0MyzJn7P0/giphy.gif"
@@ -28,7 +25,6 @@
   ],
   "cooldownResponses": [
     "I need to recharge my tolerance battery; it's running dangerously low.",
-    "https://cdn.discordapp.com/attachments/1180008092495249449/1199049443140440216/done.gif",
-    "https://cdn.discordapp.com/attachments/1180008092495249449/1199050440835338290/giphy_15.gif"
+    "I have provided you with as much as I could for now."
   ]
 }
