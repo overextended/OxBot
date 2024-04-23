@@ -71,7 +71,7 @@ const Warn: Command = {
 
       await sendWarningDM(interaction, userOption, reasonOptionRaw, timeoutDuration);
 
-      await interaction.channel?.send(`<@${userOption.id}> has been warned.`);
+      await interaction.channel?.send(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
     } catch (error) {
       console.error('Error processing the warning:', error);
       let errorMessage = 'An error occurred while processing the warning.';
