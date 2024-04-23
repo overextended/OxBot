@@ -108,7 +108,7 @@ async function sendWarningDM(
   } catch (err) {
     console.error('Failed to send DM:', err);
     await interaction.followUp({
-      content: `Failed to send a DM to <@${user.id}>. They have been warned, but check their DM settings.`,
+      content: `Failed to send a DM to <@${user.id}>. They have been warned, but their DMs are disabled.`,
       ephemeral: true,
     });
   }
