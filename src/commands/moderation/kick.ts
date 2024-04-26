@@ -28,11 +28,11 @@ const Kick: Command = {
     }
 
     const reasonOption = interaction.options.get('reason');
-    const reason = (reasonOption?.value as string) || undefined;
+    const reason = (reasonOption?.value as string) || "No reason provided";
 
     try {
       await member.kick(reason);
-      await interaction.reply({ content: `Successfully kicked ${member.user.tag}.`, ephemeral: false });
+      await interaction.reply({ content: `${member.user.tag} has been **kicked**. Reason: ${reason}`, ephemeral: false });
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'Failed to kick the user.', ephemeral: true });

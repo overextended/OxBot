@@ -52,7 +52,7 @@ const Ban: Command = {
         },
       });
 
-      await interaction.reply({ content: `Banned <@${user.id}>. Reason: ${reason}`, ephemeral: true });
+      await interaction.reply({ content: `<@${user.id}> has been **banned**. Reason: ${reason}`, ephemeral: false });
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'An error occurred while processing the ban.', ephemeral: true });
