@@ -7,13 +7,14 @@ export async function handleMemberWarn(
   reason: string,
   warnCount: number,
   timeoutDuration: number | null,
-  guild: Guild
+  guild: Guild,
+  warnId: number
 ) {
   try {
     const warnEmbed = new EmbedBuilder()
       .setColor('#FFFF00')
       .setTitle('Member Warned')
-      .setDescription(`<@${warnedUser.id}> has been **warned** by <@${issuer.id}>.`)
+      .setDescription(`<@${warnedUser.id}> has been **warned** by <@${issuer.id}>.\n\n Warn ID: ${warnId}`)
       .addFields(
         { name: 'Reason', value: reason },
         { name: 'Total Warnings', value: warnCount.toString(), inline: true }
