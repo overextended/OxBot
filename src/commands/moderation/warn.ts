@@ -98,9 +98,7 @@ async function sendWarningDM(
   let dmMessage = `You have been warned for the following reason: ${reason}.`;
 
   if (timeoutDuration !== null) {
-    dmMessage += `\nAdditionally, you have been placed in timeout for ${
-      timeoutDuration / 60000
-    } minutes due to repeated warnings.`;
+    dmMessage += `\nAdditionally, you have been placed in timeout for ${timeoutDuration / 60000} minutes due to repeated warnings.`;
   }
 
   try {
@@ -108,13 +106,21 @@ async function sendWarningDM(
     await dmChannel.send(dmMessage);
   } catch (err) {
     console.error('Failed to send DM:', err);
-  } finally {
-    await interaction.followUp({
-      content: dmMessage.includes('DM')
-        ? `Failed to send a DM to <@${user.id}>. They have been warned, but their DMs are disabled.`
-        : dmMessage,
-      ephemeral: true,
-    });
+
+    if (
+      err instanceof DiscordAPIError &&
+      (err.code === 50007 || err.message.includes('Cannot send messages to this user'))
+    ) {
+      await interaction.followUp({
+        content: `Failed to send a DM to <@${user.id}>. They have been warned, but their DMs are disabled.`,
+        ephemeral: true,
+      });
+    } else {
+      await interaction.followUp({
+        content: `An error occurred while trying to send a DM: ${err}`,
+        ephemeral: true,
+      });
+    }
   }
 }
 
