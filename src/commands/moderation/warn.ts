@@ -108,8 +108,11 @@ async function sendWarningDM(
     await dmChannel.send(dmMessage);
   } catch (err) {
     console.error('Failed to send DM:', err);
+  } finally {
     await interaction.followUp({
-      content: `Failed to send a DM to <@${user.id}>. They have been warned, but their DMs are disabled.`,
+      content: dmMessage.includes('DM')
+        ? `Failed to send a DM to <@${user.id}>. They have been warned, but their DMs are disabled.`
+        : dmMessage,
       ephemeral: true,
     });
   }
