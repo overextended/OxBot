@@ -30,7 +30,7 @@ const FetchWarns: Command = {
       }
 
       const warningMessages = warnings.map((warn) => `ID: ${warn.id}, Reason: ${warn.reason}`).join('\n');
-      await interaction.reply({ content: `Warnings for <@${userOption.id}>:\n${warningMessages}`, ephemeral: true });
+      await interaction.reply({ content: `Warnings for <@${userOption.id}>:\n${warningMessages}`, ephemeral: false });
     } catch (error) {
       console.error(error);
       await interaction.reply({ content: 'An error occurred while fetching the warnings.', ephemeral: true });

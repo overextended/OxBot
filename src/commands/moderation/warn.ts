@@ -42,7 +42,7 @@ const Warn: Command = {
         create: { id: userOption.id, warns: 1 },
       });
 
-      await prisma.warn.create({
+      const { id } = await prisma.warn.create({
         data: {
           reason: reasonOptionRaw,
           issuerId: interaction.user.id,
@@ -57,7 +57,8 @@ const Warn: Command = {
         reasonOptionRaw,
         targetUser.warns,
         timeoutDuration,
-        interaction.guild
+        interaction.guild,
+        id
       );
 
       try {
