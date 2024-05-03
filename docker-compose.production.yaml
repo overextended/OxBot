@@ -3,6 +3,7 @@ version: '3.9'
 services:
   bot:
     container_name: oxbot
+    image: ipajudd/oxbot:latest
     build: .
     restart: unless-stopped
     command: pnpm start:production
