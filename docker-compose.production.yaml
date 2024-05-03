@@ -8,11 +8,11 @@ services:
     command: pnpm start:production
     volumes:
       - db-data:/app/prisma
+      - ./.env:/app/.env
+    env_file:
+      - ./.env 
     environment:
       - DATABASE_URL=file:/app/prisma/data.db
-      - TOKEN=${TOKEN}
-      - GUILD_ID=${GUILD_ID}
-      - CLIENT_ID=${CLIENT_ID}
 
   watchtower:
     image: containrrr/watchtower
