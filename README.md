@@ -1,4 +1,5 @@
-OxBot
+## OxBot
+Official Discord Bot for the Overextended Discord Server.
 
 Both Development and Production require use of [Docker](https://www.docker.com/get-started/)
 
