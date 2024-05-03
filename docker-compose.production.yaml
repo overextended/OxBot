@@ -1,7 +1,21 @@
 version: '3.9'
+
 services:
   bot:
     container_name: oxbot
     build: .
     restart: unless-stopped
     command: pnpm start:production
+    volumes:
+      - db-data:/app/prisma
+    environment:
+      - DATABASE_URL=file:/app/prisma/data.db
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 600 oxbot  # Polls every 10 minutes and updates only the 'oxbot' container
+
+volumes:
+  db-data:
