@@ -10,6 +10,9 @@ services:
       - db-data:/app/prisma
     environment:
       - DATABASE_URL=file:/app/prisma/data.db
+      - TOKEN=${TOKEN}
+      - GUILD_ID=${GUILD_ID}
+      - CLIENT_ID=${CLIENT_ID}
 
   watchtower:
     image: containrrr/watchtower
