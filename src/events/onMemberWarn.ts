@@ -1,5 +1,6 @@
 import { User, Guild, TextChannel, EmbedBuilder } from 'discord.js';
 import { log_channel } from '../settings.json';
+import logger from '../utils/logger';
 
 export async function handleMemberWarn(
   warnedUser: User,
@@ -38,6 +39,6 @@ export async function handleMemberWarn(
 
     await channel.send({ embeds: [warnEmbed] });
   } catch (error) {
-    console.error('Failed to log warning:', error);
+    logger.error('Failed to log warning:', error);
   }
 }

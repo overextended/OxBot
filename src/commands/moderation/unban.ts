@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { Command } from '../../interfaces/command';
+import logger from '../../utils/logger';
 
 const prisma = new PrismaClient();
 
@@ -53,7 +54,7 @@ const Unban: Command = {
       await interaction.guild.members.unban(user, reason);
       await interaction.reply({ content: `Unbanned <@${user.id}>. Reason: ${reason}`, ephemeral: true });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       await interaction.reply({ content: 'An error occurred while processing the unban.', ephemeral: true });
     }
   },

@@ -1,5 +1,6 @@
 import { GuildMember, SlashCommandBuilder, PermissionFlagsBits, CommandInteraction } from 'discord.js';
 import { Command } from '../../interfaces/command';
+import logger from '../../utils/logger';
 
 const Kick: Command = {
   data: new SlashCommandBuilder()
@@ -34,7 +35,7 @@ const Kick: Command = {
       await member.kick(reason);
       await interaction.reply({ content: `${member.user.tag} has been **kicked**. Reason: ${reason}`, ephemeral: false });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       await interaction.reply({ content: 'Failed to kick the user.', ephemeral: true });
     }
   },

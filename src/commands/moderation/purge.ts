@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, CommandInteraction, PermissionFlagsBits, TextChannel } from 'discord.js';
 import { Command } from '../../interfaces/command';
+import logger from '../../utils/logger';
 
 const Purge: Command = {
   data: new SlashCommandBuilder()
@@ -55,7 +56,7 @@ const Purge: Command = {
         await interaction.channel.bulkDelete(messages, true);
         await interaction.reply({ content: `Successfully deleted ${messages.size} messages.`, ephemeral: true });
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         await interaction.reply({ content: 'An error occurred while deleting messages.', ephemeral: true });
       }
     } else if (subcommand === 'user') {
@@ -72,7 +73,7 @@ const Purge: Command = {
           ephemeral: true,
         });
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         await interaction.reply({
           content: 'An error occurred while deleting messages.',
           ephemeral: true,
@@ -112,7 +113,7 @@ const Purge: Command = {
           ephemeral: true,
         });
       } catch (error) {
-        console.error(error);
+        logger.error(error);
         await interaction.reply({ content: 'An error occurred while deleting messages.', ephemeral: true });
       }
     }

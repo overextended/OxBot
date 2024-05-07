@@ -1,5 +1,6 @@
 import { Guild, GuildAuditLogsEntry, EmbedBuilder, TextChannel, AuditLogEvent } from 'discord.js';
 import { log_channel } from '../settings.json';
+import logger from '../utils/logger';
 
 export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
   if (auditLogEntry.action !== AuditLogEvent.MemberBanAdd) {
@@ -7,7 +8,7 @@ export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Gui
   }
 
   if (!auditLogEntry.executorId || !auditLogEntry.targetId) {
-    return console.log('Executor ID or target ID is missing from the audit log entry.');
+    return logger.info('Executor ID or target ID is missing from the audit log entry.');
   }
 
   const executor = await guild.client.users.fetch(auditLogEntry.executorId);
@@ -15,7 +16,7 @@ export const onMemberBan = async (auditLogEntry: GuildAuditLogsEntry, guild: Gui
   const targetUser = await guild.client.users.fetch(auditLogEntry.targetId);
 
   if (!executor || !targetUser) {
-    return console.log('Executor or target user is missing from the audit log entry.');
+    return logger.info('Executor or target user is missing from the audit log entry.');
   }
 
   if (auditLogEntry.executorId === '874059310869655662') return; // Check for Warden

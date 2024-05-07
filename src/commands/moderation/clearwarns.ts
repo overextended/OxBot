@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction, GuildMember } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { Command } from '../../interfaces/command';
+import logger from '../../utils/logger';
 
 const prisma = new PrismaClient();
 
@@ -83,7 +84,7 @@ const ClearWarn: Command = {
         }
       }
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       await interaction.reply({ content: 'An error occurred while clearing the warnings.', ephemeral: true });
     }
   },

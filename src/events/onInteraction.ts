@@ -1,6 +1,7 @@
 import { Interaction, TextChannel } from 'discord.js';
 import commands from '../handlers/commandHandler';
 import { log_channel } from '../settings.json';
+import logger from '../utils/logger';
 
 export const onInteraction = async (interaction: Interaction) => {
   if (!interaction.isChatInputCommand()) return;
@@ -17,7 +18,7 @@ export const onInteraction = async (interaction: Interaction) => {
     try {
       await command.run(interaction);
     } catch (error) {
-      console.error(`Error executing command ${interaction.commandName}:`, error);
+      logger.error(`Error executing command ${interaction.commandName}:`, error);
       await interaction.reply({ content: 'There was an error executing that command.', ephemeral: true });
     }
   }

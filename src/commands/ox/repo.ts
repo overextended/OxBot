@@ -2,6 +2,7 @@ import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.j
 import { Command } from '../../interfaces/command';
 import { GithubApi, GithubUrl, ResourceChoices } from '../../constants';
 import axios from 'axios';
+import logger from '../../utils/logger';
 
 const Repo: Command = {
   data: new SlashCommandBuilder()
@@ -40,7 +41,7 @@ const newEmbed = async (interaction: CommandInteraction, repository: string) => 
 
     return interaction.reply({ embeds: [repoEmbed] });
   } catch (error) {
-    console.error('Error fetching repository data:', error);
+    logger.error('Error fetching repository data:', error);
     return interaction.reply('An error occurred while fetching repository data.');
   }
 };

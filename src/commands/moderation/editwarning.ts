@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction } from 'discord.js';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Command } from '../../interfaces/command';
+import logger from '../../utils/logger';
 
 const prisma = new PrismaClient();
 
@@ -45,7 +46,7 @@ const EditWarning: Command = {
 
       await interaction.reply({ content: `Warning ID ${updatedWarning.id} has been updated.`, ephemeral: true });
     } catch (error) {
-      console.error('Error updating the warning:', error);
+      logger.error('Error updating the warning:', error);
       let errorMessage = 'An error occurred while updating the warning.';
 
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {

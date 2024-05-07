@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { Command } from '../../interfaces/command';
+import logger from '../../utils/logger';
 
 const prisma = new PrismaClient();
 
@@ -32,7 +33,7 @@ const FetchWarns: Command = {
       const warningMessages = warnings.map((warn) => `ID: ${warn.id}, Reason: ${warn.reason}`).join('\n');
       await interaction.reply({ content: `Warnings for <@${userOption.id}>:\n${warningMessages}`, ephemeral: false });
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       await interaction.reply({ content: 'An error occurred while fetching the warnings.', ephemeral: true });
     }
   },

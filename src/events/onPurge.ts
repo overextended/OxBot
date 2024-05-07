@@ -1,6 +1,7 @@
 import { Collection, Message, EmbedBuilder, TextChannel, GuildTextBasedChannel, PartialMessage } from 'discord.js';
 import { Bot } from '..';
 import { log_channel } from '../settings.json';
+import logger from '../utils/logger';
 
 export const onMessageDeleteBulk = async (
   messages: Collection<string, Message | PartialMessage>,
@@ -22,7 +23,7 @@ export const onMessageDeleteBulk = async (
     try {
       logChannel.send({ embeds: [embed] });
     } catch (error) {
-      console.error('Error sending bulk deletion log:', error);
+      logger.error('Error sending bulk deletion log:', error);
     }
   }
 };

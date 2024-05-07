@@ -2,6 +2,7 @@ import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction, User, Dis
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import { handleMemberWarn } from '../../events/onMemberWarn';
+import logger from '../../utils/logger';
 
 const prisma = new PrismaClient();
 
@@ -65,7 +66,7 @@ const Warn: Command = {
         const member = await interaction.guild.members.fetch(userOption.id);
         await member.timeout(timeoutDuration, `Accumulated Warns: ${targetUser.warns}`);
       } catch (error) {
-        console.error('Error fetching guild member:', error);
+        logger.error('Error fetching guild member:', error);
         await interaction.followUp({ content: 'Failed to find the specified user in the guild.' });
         return;
       }
@@ -74,7 +75,7 @@ const Warn: Command = {
 
       await interaction.channel?.send(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
     } catch (error) {
-      console.error('Error processing the warning:', error);
+      logger.error('Error processing the warning:', error);
       let errorMessage = 'An error occurred while processing the warning.';
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         errorMessage =
@@ -105,12 +106,8 @@ async function sendWarningDM(
     const dmChannel = await user.createDM();
     await dmChannel.send(dmMessage);
   } catch (err) {
-    console.error('Failed to send DM:', err);
-
-    if (
-      err instanceof DiscordAPIError &&
-      (err.code === 50007 || err.message.includes('Cannot send messages to this user'))
-    ) {
+    logger.error('Failed to send DM:', err);
+    if (err instanceof DiscordAPIError && err.code === 50007) {
       await interaction.followUp({
         content: `Failed to send a DM to <@${user.id}>. They have been warned, but their DMs are disabled.`,
         ephemeral: true,
@@ -123,6 +120,7 @@ async function sendWarningDM(
     }
   }
 }
+
 
 function calculateTimeoutDuration(warnCount: number): number {
   let minutes;

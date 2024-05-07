@@ -1,13 +1,14 @@
 import { Message, EmbedBuilder, PartialMessage, TextChannel, AuditLogEvent, Attachment } from 'discord.js';
 import { Bot } from '..';
 import { log_channel } from '../settings.json';
+import logger from '../utils/logger';
 
 export const onMessageDelete = async (message: Message | PartialMessage) => {
   if (message.partial) {
     try {
       await message.fetch();
     } catch (error) {
-      console.error('Error fetching the message:', error);
+      logger.error('Error fetching the message:', error);
       return;
     }
   }
@@ -48,7 +49,7 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
     try {
       logChannel.send({ embeds: [embed] });
     } catch (error) {
-      console.error('Error sending embed:', error);
+      logger.error('Error sending embed:', error);
     }
   }
 };

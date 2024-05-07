@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { Command } from '../../interfaces/command';
+import logger from '../../utils/logger';
 
 const BulkUnban: Command = {
   data: new SlashCommandBuilder()
@@ -29,13 +30,13 @@ const BulkUnban: Command = {
 
     try {
       const bans = await interaction.guild.bans.fetch();
-      console.log(`Total bans found: ${bans.size}`); // <-- Log total number of bans
+      logger.info(`Total bans found: ${bans.size}`); // <-- Log total number of bans
 
       const unbans = bans.filter((ban) => ban.reason && ban.reason.toLowerCase().includes(reasonOption.toLowerCase()));
-      console.log(`Matching bans found: ${unbans.size}`); // <-- Log matched bans
+      logger.info(`Matching bans found: ${unbans.size}`); // <-- Log matched bans
 
       for (const ban of unbans.values()) {
-        console.log(`Attempting to unban: ${ban.user.tag} - Reason: ${ban.reason}`); // <-- Log each user being unbanned
+        logger.info(`Attempting to unban: ${ban.user.tag} - Reason: ${ban.reason}`); // <-- Log each user being unbanned
         await interaction.guild.bans.remove(ban.user, `Used /bulkunban for reason: ${reasonOption}`);
         amount++;
       }
@@ -43,7 +44,7 @@ const BulkUnban: Command = {
       await interaction.reply(`Successfully unbanned ${amount} users.`);
     } catch (e) {
       await interaction.reply('An error occurred while processing the unbans.');
-      console.error(e);
+      logger.error(e);
     }
   },
 };

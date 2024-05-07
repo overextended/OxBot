@@ -1,5 +1,6 @@
 import { Interaction, EmbedBuilder, TextChannel } from 'discord.js';
 import { log_channel } from '../settings.json';
+import logger from '../utils/logger';
 
 const commandWhitelist = new Set(['docs', 'issue', 'ox', 'ping', 'repo', 'guild', 'whois', 'warn']);
 
@@ -21,14 +22,14 @@ export async function onSlashCommand(interaction: Interaction) {
         .setTimestamp()
         .setFooter({ text: `User ID: ${interaction.user.id}` });
 
-      const logChannel = (await interaction.guild.channels.fetch(log_channel).catch(console.error)) as TextChannel;
+      const logChannel = (await interaction.guild.channels.fetch(log_channel).catch(logger.error)) as TextChannel;
       if (logChannel) {
         await logChannel.send({ embeds: [logEmbed] });
       } else {
-        console.error(`Log channel with ID ${log_channel} not found`);
+        logger.error(`Log channel with ID ${log_channel} not found`);
       }
     } catch (error) {
-      console.error('Failed to log slash command usage:', error);
+      logger.error('Failed to log slash command usage:', error);
     }
   }
 }
