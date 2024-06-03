@@ -9,7 +9,7 @@ export const onMemberLeave = async (member: GuildMember | PartialGuildMember) =>
     try {
       member = await member.fetch();
     } catch {
-      await channel.send(`error fetching partial member ${member.user.username}`);
+      await channel.send(`error fetching partial member <@${member.user.id}> (${member.user.username})`);
       return;
     }
   }
@@ -30,9 +30,9 @@ export const onMemberLeave = async (member: GuildMember | PartialGuildMember) =>
     days > 0
       ? `${days} days, ${hours} hours, and ${minutes} minutes`
       : hours > 0
-      ? `${hours} hours and ${minutes} minutes`
-      : `${minutes} minutes`;
+        ? `${hours} hours and ${minutes} minutes`
+        : `${minutes} minutes`;
 
-  const farewellMessage = `${member.user.username} has left the server. They were here for ${durationMessage}.`;
+  const farewellMessage = `<@${member.user.id}> (${member.user.username}) has left the server. They were here for ${durationMessage}.`;
   channel.send(farewellMessage);
 };

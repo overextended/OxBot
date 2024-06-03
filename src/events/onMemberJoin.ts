@@ -6,7 +6,7 @@ export const onMemberJoin = async (member: GuildMember) => {
   const channel = member.guild.channels.cache.get(member_activity_channel) as TextChannel;
   if (!channel) return;
 
-  const welcomeMessage = `Welcome ${member.user.username} to the server!`;
+  const welcomeMessage = `Welcome <@${member.user.id}> (${member.user.username}) to the server!`;
   channel.send(welcomeMessage);
 
   const roleId = '842455998266605610'; // Overextended Member RoleID
