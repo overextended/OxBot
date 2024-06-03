@@ -35,16 +35,22 @@ const BulkUnban: Command = {
       const unbans = bans.filter((ban) => ban.reason && ban.reason.toLowerCase().includes(reasonOption.toLowerCase()));
       logger.info(`Matching bans found: ${unbans.size}`); // <-- Log matched bans
 
+      await interaction.reply(`Starting to unban ${unbans.size} users. This might take a while...`);
+
       for (const ban of unbans.values()) {
         logger.info(`Attempting to unban: ${ban.user.tag} - Reason: ${ban.reason}`); // <-- Log each user being unbanned
         await interaction.guild.bans.remove(ban.user, `Used /bulkunban for reason: ${reasonOption}`);
         amount++;
       }
 
-      await interaction.reply(`Successfully unbanned ${amount} users.`);
+      await interaction.followUp(`Successfully unbanned ${amount} users.`);
     } catch (e) {
-      await interaction.reply('An error occurred while processing the unbans.');
       logger.error(e);
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp('An error occurred while processing the unbans.');
+      } else {
+        await interaction.reply('An error occurred while processing the unbans.');
+      }
     }
   },
 };
