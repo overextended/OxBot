@@ -52,28 +52,36 @@ const Warn: Command = {
       });
 
       const timeoutDuration = calculateTimeoutDuration(targetUser.warns);
-      handleMemberWarn(
-        userOption,
-        interaction.user,
-        reasonOptionRaw,
-        targetUser.warns,
-        timeoutDuration,
-        interaction.guild,
-        id
-      );
 
       try {
         const member = await interaction.guild.members.fetch(userOption.id);
-        await member.timeout(timeoutDuration, `Accumulated Warns: ${targetUser.warns}`);
+        const currentTimeoutEnd = member.communicationDisabledUntilTimestamp;
+
+        let combinedTimeoutDuration = timeoutDuration;
+        if (currentTimeoutEnd && currentTimeoutEnd > Date.now()) {
+          const remainingTime = currentTimeoutEnd - Date.now();
+          combinedTimeoutDuration += remainingTime;
+        }
+
+        await member.timeout(combinedTimeoutDuration, `Accumulated Warns: ${targetUser.warns}`);
+
+        handleMemberWarn(
+          userOption,
+          interaction.user,
+          reasonOptionRaw,
+          targetUser.warns,
+          combinedTimeoutDuration,
+          interaction.guild,
+          id
+        );
+
+        await sendWarningDM(interaction, userOption, reasonOptionRaw, combinedTimeoutDuration);
+        await interaction.followUp(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
       } catch (error) {
         logger.error('Error fetching guild member:', error);
         await interaction.followUp({ content: 'Failed to find the specified user in the guild.' });
         return;
       }
-
-      await sendWarningDM(interaction, userOption, reasonOptionRaw, timeoutDuration);
-
-      await interaction.channel?.send(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
     } catch (error) {
       logger.error('Error processing the warning:', error);
       let errorMessage = 'An error occurred while processing the warning.';
@@ -120,7 +128,6 @@ async function sendWarningDM(
     }
   }
 }
-
 
 function calculateTimeoutDuration(warnCount: number): number {
   let minutes;
