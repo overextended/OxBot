@@ -76,7 +76,9 @@ const Warn: Command = {
         );
 
         await sendWarningDM(interaction, userOption, reasonOptionRaw, combinedTimeoutDuration);
-        await interaction.followUp(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
+        // await interaction.followUp(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
+
+        await interaction.channel?.send(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
       } catch (error) {
         logger.error('Error fetching guild member:', error);
         await interaction.followUp({ content: 'Failed to find the specified user in the guild.' });
