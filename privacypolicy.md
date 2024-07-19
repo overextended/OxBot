@@ -1,4 +1,4 @@
-# Privacy Policy for [Your Bot Name]
+# Privacy Policy for OxBot
 
 Last updated: [Date]
 

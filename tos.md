@@ -1,4 +1,4 @@
-# Terms of Service for [Your Bot Name]
+# Terms of Service for OxBot
 
 Last updated: [Date]
 
