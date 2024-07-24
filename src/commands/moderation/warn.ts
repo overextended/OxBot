@@ -1,4 +1,10 @@
-import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction, User, DiscordAPIError } from 'discord.js';
+import {
+  SlashCommandBuilder,
+  PermissionFlagsBits,
+  ChatInputCommandInteraction,
+  User,
+  DiscordAPIError,
+} from 'discord.js';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import { handleMemberWarn } from '../../events/onMemberWarn';
@@ -15,7 +21,7 @@ const Warn: Command = {
       option.setName('reason').setDescription('The reason for the warning').setRequired(true)
     ),
 
-  async run(interaction: CommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
       return;
@@ -27,10 +33,10 @@ const Warn: Command = {
     }
 
     const userOption = interaction.options.getUser('user', true);
-    const reasonOptionRaw = interaction.options.get('reason')?.value;
+    const reasonOptionRaw = interaction.options.getString('reason');
 
-    if (typeof reasonOptionRaw !== 'string') {
-      await interaction.reply({ content: 'The reason must be a string.', ephemeral: true });
+    if (reasonOptionRaw === null) {
+      await interaction.reply({ content: 'Please provide a reason for the warning.', ephemeral: true });
       return;
     }
 
@@ -101,7 +107,7 @@ const Warn: Command = {
 };
 
 async function sendWarningDM(
-  interaction: CommandInteraction,
+  interaction: ChatInputCommandInteraction,
   user: User,
   reason: string,
   timeoutDuration: number | null

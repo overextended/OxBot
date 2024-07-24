@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, CommandInteraction, EmbedBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { Command } from '../../interfaces/command';
 
 const Whois: Command = {
@@ -9,7 +9,7 @@ const Whois: Command = {
       option.setName('user').setDescription('The user to get information about').setRequired(true)
     ),
 
-  async run(interaction: CommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction) {
     const userOption = interaction.options.getUser('user', true);
     const member = await interaction.guild?.members.fetch(userOption.id);
 

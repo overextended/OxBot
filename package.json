@@ -4,28 +4,28 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "start": "node build/index.js",
-    "start:production": "pnpm build && pnpm start",
-    "dev": "nodemon -L"
-  },
+  "build": "pnpm tsc",
+  "start": "pnpm node build/index.js",
+  "start:production": "pnpm build && pnpm start",
+  "dev": "pnpm nodemon -L"
+},
   "devDependencies": {
-    "@types/node": "^20.10.7",
+    "@types/node": "^20.14.12",
     "@types/node-fetch": "^2.6.4",
     "concurrently": "^8.2.2",
-    "eslint": "^9.1.1",
+    "eslint": "^9.7.0",
     "nodemon": "^3.1.0",
-    "prettier": "3.2.5",
+    "prettier": "3.3.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
-    "@prisma/client": "^5.8.0",
-    "axios": "^1.6.8",
-    "discord.js": "^14.14.1",
+    "@prisma/client": "^5.17.0",
+    "axios": "^1.7.2",
+    "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
-    "pino": "^9.0.0",
-    "pino-pretty": "^11.0.0",
-    "prisma": "^5.8.0"
+    "pino": "^9.3.1",
+    "pino-pretty": "^11.2.1",
+    "prisma": "^5.17.0"
   }
 }

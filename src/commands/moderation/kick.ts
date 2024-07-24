@@ -1,4 +1,4 @@
-import { GuildMember, SlashCommandBuilder, PermissionFlagsBits, CommandInteraction } from 'discord.js';
+import { GuildMember, SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
 
@@ -9,7 +9,7 @@ const Kick: Command = {
     .addUserOption((option) => option.setName('user').setDescription('User to kick').setRequired(true))
     .addStringOption((option) => option.setName('reason').setDescription('Reason for kicking')),
 
-  async run(interaction: CommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a server.', ephemeral: true });
       return;
@@ -28,12 +28,15 @@ const Kick: Command = {
       return;
     }
 
-    const reasonOption = interaction.options.get('reason');
-    const reason = (reasonOption?.value as string) || "No reason provided";
+    const reasonOption = interaction.options.getString('reason');
+    const reason = reasonOption || 'No reason provided';
 
     try {
       await member.kick(reason);
-      await interaction.reply({ content: `${member.user.tag} has been **kicked**. Reason: ${reason}`, ephemeral: false });
+      await interaction.reply({
+        content: `${member.user.tag} has been **kicked**. Reason: ${reason}`,
+        ephemeral: false,
+      });
     } catch (error) {
       logger.error(error);
       await interaction.reply({ content: 'Failed to kick the user.', ephemeral: true });

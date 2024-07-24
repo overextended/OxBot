@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction, GuildMember } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction, GuildMember } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
@@ -19,7 +19,7 @@ const ClearWarn: Command = {
         .setRequired(true)
     ),
 
-  async run(interaction: CommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
       return;
@@ -37,7 +37,7 @@ const ClearWarn: Command = {
       await interaction.reply({ content: 'User not found in the guild.', ephemeral: true });
       return;
     }
-    const warnIdOption = (interaction.options as any).getString('warnid', true);
+    const warnIdOption = interaction.options.getString('warnid', true);
 
     try {
       if (warnIdOption.toLowerCase() === 'all') {

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction, PermissionFlagsBits, TextChannel } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, PermissionFlagsBits, TextChannel } from 'discord.js';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
 
@@ -37,13 +37,9 @@ const Purge: Command = {
         )
     ),
 
-  async run(interaction: CommandInteraction) {
-    if (!(interaction instanceof CommandInteraction)) {
-      return;
-    }
-
-    const subcommand = (interaction.options as any).getSubcommand();
-    const count = (interaction.options as any).getInteger('count', true);
+  async run(interaction: ChatInputCommandInteraction) {
+    const subcommand = interaction.options.getSubcommand();
+    const count = interaction.options.getInteger('count');
 
     if (!(interaction.channel instanceof TextChannel)) {
       await interaction.reply({ content: 'This command can only be used in text channels.', ephemeral: true });
@@ -52,7 +48,7 @@ const Purge: Command = {
 
     if (subcommand === 'any') {
       try {
-        const messages = await interaction.channel.messages.fetch({ limit: count });
+        const messages = await interaction.channel.messages.fetch({ limit: count ?? undefined });
         await interaction.channel.bulkDelete(messages, true);
         await interaction.reply({ content: `Successfully deleted ${messages.size} messages.`, ephemeral: true });
       } catch (error) {
@@ -65,7 +61,7 @@ const Purge: Command = {
         const allMessages = await interaction.channel.messages.fetch({ limit: 100 });
         const userMessages = allMessages.filter((msg) => msg.author.id === user.id);
 
-        const messagesToDelete = userMessages.first(count);
+        const messagesToDelete = userMessages.first(count ?? 0);
         const deletedMessages = await interaction.channel.bulkDelete(messagesToDelete, true);
 
         await interaction.reply({
@@ -82,16 +78,16 @@ const Purge: Command = {
     }
 
     if (subcommand === 'after') {
-      const messageIdOption = interaction.options.get('messageid');
-      const countOption = interaction.options.get('count');
+      const messageIdOption = interaction.options.getString('messageid');
+      const countOption = interaction.options.getInteger('count');
 
-      if (!messageIdOption || typeof messageIdOption.value !== 'string') {
+      if (!messageIdOption) {
         await interaction.reply({ content: 'Invalid message ID.', ephemeral: true });
         return;
       }
 
-      const messageId = messageIdOption.value;
-      const count = countOption && typeof countOption.value === 'number' ? countOption.value : 1;
+      const messageId = messageIdOption;
+      const count = countOption || 1;
 
       try {
         const messages = await interaction.channel.messages.fetch({ limit: 100 });

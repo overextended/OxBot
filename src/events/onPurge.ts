@@ -1,10 +1,17 @@
-import { Collection, Message, EmbedBuilder, TextChannel, GuildTextBasedChannel, PartialMessage } from 'discord.js';
+import {
+  ReadonlyCollection,
+  Message,
+  EmbedBuilder,
+  TextChannel,
+  GuildTextBasedChannel,
+  PartialMessage,
+} from 'discord.js';
 import { Bot } from '..';
 import { log_channel } from '../settings.json';
 import logger from '../utils/logger';
 
 export const onMessageDeleteBulk = async (
-  messages: Collection<string, Message | PartialMessage>,
+  messages: ReadonlyCollection<string, Message<boolean> | PartialMessage>,
   channel: GuildTextBasedChannel
 ) => {
   if (!messages.first()?.guild) return;

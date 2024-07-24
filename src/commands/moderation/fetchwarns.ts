@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
@@ -11,7 +11,7 @@ const FetchWarns: Command = {
     .setDescription('Display all warnings for a specific user')
     .addUserOption((option) => option.setName('user').setDescription('The user to check').setRequired(true)),
 
-  async run(interaction: CommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
       return;
@@ -30,7 +30,7 @@ const FetchWarns: Command = {
         return;
       }
 
-      const warningMessages = warnings.map((warn) => `ID: ${warn.id}, Reason: ${warn.reason}`).join('\n');
+      const warningMessages = warnings.map((warn: { id: number, reason: string }) => `ID: ${warn.id}, Reason: ${warn.reason}`).join('\n');
       await interaction.reply({ content: `Warnings for <@${userOption.id}>:\n${warningMessages}`, ephemeral: false });
     } catch (error) {
       logger.error(error);
