@@ -9,6 +9,7 @@ interface Stats {
 const filePath = '../stats.json';
 let stats: Stats;
 
+/* Didn't want to use fs, but I'm not sure what else to use atm */
 const loadStats = async () => {
     try {
         const data = await fs.readFile(filePath, 'utf-8');
@@ -34,7 +35,12 @@ export const updateStat = (key: keyof Stats, increment: number = 1): void => {
     stats[key] += increment;
 }
 
-setInterval(saveStats, 0.5 * 60 * 1000);
+export const getStat = (key: keyof Stats): number => {
+    return stats[key];
+}
+
+/* Don't think it's necessary to do it too frequently */
+setInterval(saveStats, 60 * 60 * 1000);
 
 loadStats().then(() => {
     saveStats();
