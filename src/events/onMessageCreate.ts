@@ -4,6 +4,7 @@ import { positivePatterns, resourcePatterns } from '../utils/patterns';
 import { guidelineResponses, resourceResponses, cooldownResponses } from '../handlers/botResponsesHandler';
 import { Bot } from '..';
 import { log_channel } from '../settings.json';
+import { updateStat } from '../handlers/stats';
 
 interface UserCooldownData {
   lastResponseTime: number;
@@ -41,6 +42,9 @@ export const onMessageCreate = async (message: Message) => {
   const isPositiveMatch = positivePatterns.some((pattern) => pattern.test(lowerCaseMessage));
 
   if (isResourceMatch || isPositiveMatch) {
+
+    updateStat(isResourceMatch ? "resource_questions" : "ignored_guidelines");
+
     if (userData.messageCount < 2) {
       const responseArray = isResourceMatch
         ? resourceResponses
@@ -82,3 +86,7 @@ async function sendCooldownLog(message: Message, lastResponseTime: number) {
     }
   }
 }
+
+setInterval(() => {
+
+});
