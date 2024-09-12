@@ -85,8 +85,4 @@ async function sendCooldownLog(message: Message, lastResponseTime: number) {
       // Error handling here when I need it
     }
   }
-}
-
-setInterval(() => {
-
-});
+};
