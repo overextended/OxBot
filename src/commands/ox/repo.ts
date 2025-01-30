@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../interfaces/command';
 import { GithubApi, GithubUrl, ResourceChoices } from '../../constants';
 import axios from 'axios';
@@ -15,14 +15,16 @@ const Repo: Command = {
         .setRequired(true)
         .addChoices(...ResourceChoices)
     ),
-  async run(interaction: CommandInteraction) {
-    const repositoryName = interaction.options.get('name')?.value as string;
+  async run(interaction: ChatInputCommandInteraction) {
+    const repositoryName = interaction.options.getString('name', true);
     await newEmbed(interaction, repositoryName);
   },
 };
 
-const newEmbed = async (interaction: CommandInteraction, repository: string) => {
+const newEmbed = async (interaction: ChatInputCommandInteraction, repository: string) => {
   try {
+    interaction.deferReply();
+
     const response = await axios.get(`${GithubApi}/${repository}`);
 
     const data = response.data;
@@ -39,10 +41,10 @@ const newEmbed = async (interaction: CommandInteraction, repository: string) => 
       )
       .setURL(`${GithubUrl}/${repository}`);
 
-    return interaction.reply({ embeds: [repoEmbed] });
+    return interaction.editReply({ embeds: [repoEmbed] });
   } catch (error) {
     logger.error('Error fetching repository data:', error);
-    return interaction.reply('An error occurred while fetching repository data.');
+    return interaction.editReply('An error occurred while fetching repository data.');
   }
 };
 

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../interfaces/command';
 
 const Guild: Command = {
@@ -18,8 +18,9 @@ const Guild: Command = {
           { name: 'Cfx.re', value: 'cfx' }
         )
     ),
-  run: async (interaction) => {
-    const guildName = interaction.options.get('name')?.value as string;
+
+  run: async (interaction: ChatInputCommandInteraction) => {
+    const guildName = interaction.options.getString('name');
 
     switch (guildName) {
       case 'qbox':

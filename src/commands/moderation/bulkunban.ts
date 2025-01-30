@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
 
@@ -6,25 +6,20 @@ const BulkUnban: Command = {
   data: new SlashCommandBuilder()
     .setName('bulkunban')
     .setDescription('Unban all people with the reason included')
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .addStringOption((option) =>
       option
         .setName('reason')
         .setDescription('The reason to check for, this checks if the provided string is included in the reason')
         .setRequired(true)
     ),
-  async run(interaction) {
+  async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply('This command can only be run in a guild.');
       return;
     }
 
-    if (!interaction.memberPermissions?.has(PermissionFlagsBits.BanMembers)) {
-      await interaction.reply('Insufficient permissions.');
-      return;
-    }
-
-    const reasonOptionRaw = interaction.options.get('reason')?.value;
-    const reasonOption = typeof reasonOptionRaw === 'string' ? reasonOptionRaw : 'No reason provided';
+    const reasonOption = interaction.options.getString('reason', true);
 
     let amount = 0;
 

@@ -1,4 +1,4 @@
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../interfaces/command';
 
 const responses = [
@@ -31,9 +31,8 @@ const Magic8Ball: Command = {
     .addStringOption((option) =>
       option.setName('question').setDescription('Your question for the magic 8-ball').setRequired(true)
     ),
-  async run(interaction: CommandInteraction) {
-    const questionOption = interaction.options.get('question', true);
-    const question = questionOption.value;
+  async run(interaction: ChatInputCommandInteraction) {
+    const question = interaction.options.getString('question', true);
     const answer = responses[Math.floor(Math.random() * responses.length)];
     await interaction.reply(`🎱 *Question:* ${question}\n🔮 *Answer:* ${answer}`);
   },

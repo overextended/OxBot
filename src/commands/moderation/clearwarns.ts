@@ -9,6 +9,7 @@ const ClearWarn: Command = {
   data: new SlashCommandBuilder()
     .setName('clearwarn')
     .setDescription('Clear warnings of a user')
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .addUserOption((option) =>
       option.setName('user').setDescription('The user whose warnings will be cleared').setRequired(true)
     )
@@ -25,16 +26,13 @@ const ClearWarn: Command = {
       return;
     }
 
-    if (!interaction.memberPermissions?.has(PermissionFlagsBits.KickMembers)) {
-      await interaction.reply({ content: 'Insufficient permissions.', ephemeral: true });
-      return;
-    }
+    interaction.deferReply({ ephemeral: true });
 
     const userOption = interaction.options.getUser('user', true);
     const member: GuildMember | null = await interaction.guild.members.fetch(userOption.id).catch(() => null);
 
     if (!member) {
-      await interaction.reply({ content: 'User not found in the guild.', ephemeral: true });
+      await interaction.editReply('User not found in the guild.');
       return;
     }
     const warnIdOption = interaction.options.getString('warnid', true);
@@ -55,15 +53,12 @@ const ClearWarn: Command = {
           await member.timeout(null);
         }
 
-        await interaction.reply({
-          content: `Cleared all warnings and removed timeout for <@${userOption.id}>.`,
-          ephemeral: true,
-        });
+        await interaction.editReply(`Cleared all warnings and removed timeout for <@${userOption.id}>.`);
       } else {
         // Clear specific warning
         const warnId = parseInt(warnIdOption);
         if (isNaN(warnId)) {
-          await interaction.reply({ content: 'Invalid warning ID provided.', ephemeral: true });
+          await interaction.editReply('Invalid warning ID provided.');
           return;
         }
 
@@ -75,17 +70,14 @@ const ClearWarn: Command = {
         });
 
         if (result.count === 0) {
-          await interaction.reply({ content: 'No warning found with the provided ID for this user.', ephemeral: true });
+          await interaction.editReply('No warning found with the provided ID for this user.');
         } else {
-          await interaction.reply({
-            content: `Cleared warning ID ${warnId} for <@${userOption.id}>.`,
-            ephemeral: true,
-          });
+          await interaction.editReply(`Cleared warning ID ${warnId} for <@${userOption.id}>.`);
         }
       }
     } catch (error) {
       logger.error(error);
-      await interaction.reply({ content: 'An error occurred while clearing the warnings.', ephemeral: true });
+      await interaction.editReply('An error occurred while clearing the warnings.');
     }
   },
 };

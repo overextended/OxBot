@@ -1,4 +1,4 @@
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../interfaces/command';
 import { GithubUrl, ResourceChoices } from '../../constants';
 
@@ -13,8 +13,8 @@ const Issue: Command = {
         .setRequired(true)
         .addChoices(...ResourceChoices)
     ),
-  async run(interaction: CommandInteraction) {
-    const repo = interaction.options.get('repository')?.value as string;
+  async run(interaction: ChatInputCommandInteraction) {
+    const repo = interaction.options.getString('repository', true);
     if (!repo) {
       await interaction.reply({ content: 'Invalid repository selected.', ephemeral: true });
       return;

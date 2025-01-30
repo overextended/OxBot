@@ -6,17 +6,13 @@ const Kick: Command = {
   data: new SlashCommandBuilder()
     .setName('kick')
     .setDescription('Kick a user from the server')
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .addUserOption((option) => option.setName('user').setDescription('User to kick').setRequired(true))
     .addStringOption((option) => option.setName('reason').setDescription('Reason for kicking')),
 
   async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a server.', ephemeral: true });
-      return;
-    }
-
-    if (!interaction.memberPermissions?.has(PermissionFlagsBits.KickMembers)) {
-      await interaction.reply({ content: 'You do not have permission to kick members.', ephemeral: true });
       return;
     }
 
