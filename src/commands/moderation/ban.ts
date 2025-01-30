@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
@@ -9,6 +9,7 @@ const Ban: Command = {
   data: new SlashCommandBuilder()
     .setName('ban')
     .setDescription('Ban a user')
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .addUserOption((option) => option.setName('user').setDescription('The user to ban').setRequired(true))
     .addStringOption((option) => option.setName('reason').setDescription('The reason for the ban').setRequired(false))
     .addIntegerOption((option) =>
@@ -18,24 +19,18 @@ const Ban: Command = {
         .setRequired(false)
     ),
 
-  async run(interaction: CommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
       return;
     }
 
-    if (!interaction.memberPermissions?.has(PermissionFlagsBits.BanMembers)) {
-      await interaction.reply({ content: 'Insufficient permissions.', ephemeral: true });
-      return;
-    }
+    const user = interaction.options.getUser('user', true);
+    const reasonOption = interaction.options.getString('reason');
+    const deleteMessageDaysOption = interaction.options.getInteger('delete_message_days');
 
-    const userOption = interaction.options.get('user');
-    const reasonOption = interaction.options.get('reason');
-    const deleteMessageDaysOption = interaction.options.get('delete_message_days');
-
-    const user = userOption?.user;
-    const reason = (reasonOption?.value as string) || 'No reason provided';
-    const deleteMessageDays = deleteMessageDaysOption ? parseInt(deleteMessageDaysOption.value as string) : 0;
+    const reason = (reasonOption as string) || 'No reason provided';
+    const deleteMessageDays = deleteMessageDaysOption || 0;
 
     if (!user) {
       await interaction.reply({ content: 'User not found!', ephemeral: true });

@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../interfaces/command';
 import { DocsUrl, ResourceChoices } from '../../constants';
 
@@ -13,14 +13,13 @@ const Docs: Command = {
         .setRequired(true)
         .addChoices(...ResourceChoices)
     ),
-  async run(interaction: CommandInteraction) {
-    const resourceOption = interaction.options.get('resource');
-    const resource = resourceOption?.value as string;
+  async run(interaction: ChatInputCommandInteraction) {
+    const resource = interaction.options.getString('resource', true);
     await sendDocumentationEmbed(interaction, resource);
   },
 };
 
-const sendDocumentationEmbed = async (interaction: CommandInteraction, resource: string) => {
+const sendDocumentationEmbed = async (interaction: ChatInputCommandInteraction, resource: string) => {
   const docsEmbed = new EmbedBuilder()
     .setTitle('Documentation')
     .setDescription('Please read the documentation thoroughly and carefully.')

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, PermissionFlagsBits, CommandInteraction } from 'discord.js';
+import { SlashCommandBuilder, PermissionFlagsBits, ChatInputCommandInteraction } from 'discord.js';
 import { PrismaClient, Prisma } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
@@ -9,6 +9,7 @@ const EditWarning: Command = {
   data: new SlashCommandBuilder()
     .setName('editwarning')
     .setDescription('Edit the reason for a given warning')
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .addIntegerOption((option) =>
       option.setName('id').setDescription('The ID of the warning to edit').setRequired(true)
     )
@@ -16,32 +17,19 @@ const EditWarning: Command = {
       option.setName('newmessage').setDescription('The new warning message').setRequired(true)
     ),
 
-  async run(interaction: CommandInteraction) {
+  async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
       return;
     }
 
-    if (!interaction.memberPermissions?.has(PermissionFlagsBits.KickMembers)) {
-      await interaction.reply({ content: 'Insufficient permissions.', ephemeral: true });
-      return;
-    }
-
-    const warningIdOption = interaction.options.get('id');
-    const newMessageOption = interaction.options.get('newmessage');
-
-    const warningId = warningIdOption ? parseInt(warningIdOption.value as string) : null;
-    const newMessage = newMessageOption ? (newMessageOption.value as string) : null;
-
-    if (warningId === null || newMessage === null) {
-      await interaction.reply({ content: 'Invalid command usage.', ephemeral: true });
-      return;
-    }
+    const warningIdOption = interaction.options.getInteger('id', true);
+    const newMessageOption = interaction.options.getString('newmessage', true);
 
     try {
       const updatedWarning = await prisma.warn.update({
-        where: { id: warningId },
-        data: { reason: newMessage },
+        where: { id: warningIdOption },
+        data: { reason: newMessageOption },
       });
 
       await interaction.reply({ content: `Warning ID ${updatedWarning.id} has been updated.`, ephemeral: true });

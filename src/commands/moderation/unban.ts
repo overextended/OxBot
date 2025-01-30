@@ -9,6 +9,7 @@ const Unban: Command = {
   data: new SlashCommandBuilder()
     .setName('unban')
     .setDescription('Unban a user')
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .addUserOption((option) => option.setName('user').setDescription('The user to unban').setRequired(true))
     .addStringOption((option) =>
       option.setName('reason').setDescription('The reason for the unban').setRequired(false)
@@ -20,10 +21,7 @@ const Unban: Command = {
       return;
     }
 
-    if (!interaction.memberPermissions?.has(PermissionFlagsBits.BanMembers)) {
-      await interaction.reply({ content: 'Insufficient permissions.', ephemeral: true });
-      return;
-    }
+    await interaction.deferReply({ ephemeral: true });
 
     const userOption = interaction.options.get('user');
     const reasonOption = interaction.options.get('reason');
@@ -32,7 +30,7 @@ const Unban: Command = {
     const reason = (reasonOption?.value as string) || 'No reason provided';
 
     if (!user) {
-      await interaction.reply({ content: 'User not found!', ephemeral: true });
+      await interaction.editReply('User not found!');
       return;
     }
 
@@ -52,10 +50,10 @@ const Unban: Command = {
       }
 
       await interaction.guild.members.unban(user, reason);
-      await interaction.reply({ content: `Unbanned <@${user.id}>. Reason: ${reason}`, ephemeral: true });
+      await interaction.editReply(`Unbanned <@${user.id}>. Reason: ${reason}`);
     } catch (error) {
       logger.error(error);
-      await interaction.reply({ content: 'An error occurred while processing the unban.', ephemeral: true });
+      await interaction.editReply('An error occurred while processing the unban.');
     }
   },
 };

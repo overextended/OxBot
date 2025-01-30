@@ -1,4 +1,4 @@
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, SlashCommandBuilder } from 'discord.js';
 import { Command } from '../../interfaces/command';
 
 const choices = ['rock', 'paper', 'scissors'];
@@ -32,8 +32,8 @@ const RockPaperScissors: Command = {
         .setRequired(true)
         .addChoices(...choices.map((choice) => ({ name: choice, value: choice })))
     ),
-  async run(interaction: CommandInteraction) {
-    const userChoice = interaction.options.get('choice', true)?.value as string;
+  async run(interaction: ChatInputCommandInteraction) {
+    const userChoice = interaction.options.getString('choice', true);
     const botChoice = choices[Math.floor(Math.random() * choices.length)];
     const result = determineWinner(userChoice, botChoice);
 
