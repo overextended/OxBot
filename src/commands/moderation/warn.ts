@@ -16,6 +16,7 @@ const Warn: Command = {
   data: new SlashCommandBuilder()
     .setName('warn')
     .setDescription('Issue a warning to a user')
+    .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
     .addUserOption((option) => option.setName('user').setDescription('The user to warn').setRequired(true))
     .addStringOption((option) =>
       option.setName('reason').setDescription('The reason for the warning').setRequired(true)
@@ -24,11 +25,6 @@ const Warn: Command = {
   async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
       await interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
-      return;
-    }
-
-    if (!interaction.memberPermissions?.has(PermissionFlagsBits.KickMembers)) {
-      await interaction.reply({ content: 'Insufficient permissions.', ephemeral: true });
       return;
     }
 
@@ -85,9 +81,10 @@ const Warn: Command = {
         // await interaction.followUp(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
 
         await interaction.channel?.send(`<@${userOption.id}> has been warned. Reason: ${reasonOptionRaw}`);
+        await interaction.editReply(`Successfully warned <@${userOption.id}>. User is timed out for ${combinedTimeoutDuration / 60000} minutes.`)
       } catch (error) {
         logger.error('Error fetching guild member:', error);
-        await interaction.followUp({ content: 'Failed to find the specified user in the guild.' });
+        await interaction.editReply({ content: 'Failed to find the specified user in the guild.' });
         return;
       }
     } catch (error) {
@@ -101,7 +98,7 @@ const Warn: Command = {
       } else if (error instanceof Error && error.name === 'PermissionError') {
         errorMessage = `Permission error: ${error.message}`;
       }
-      await interaction.followUp({ content: errorMessage });
+      await interaction.editReply({ content: errorMessage });
     }
   },
 };

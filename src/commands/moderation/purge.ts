@@ -46,14 +46,16 @@ const Purge: Command = {
       return;
     }
 
+    interaction.deferReply({ ephemeral: true });
+
     if (subcommand === 'any') {
       try {
         const messages = await interaction.channel.messages.fetch({ limit: count ?? undefined });
         await interaction.channel.bulkDelete(messages, true);
-        await interaction.reply({ content: `Successfully deleted ${messages.size} messages.`, ephemeral: true });
+        await interaction.editReply(`Successfully deleted ${messages.size} messages.`);
       } catch (error) {
         logger.error(error);
-        await interaction.reply({ content: 'An error occurred while deleting messages.', ephemeral: true });
+        await interaction.editReply('An error occurred while deleting messages.');
       }
     } else if (subcommand === 'user') {
       const user = interaction.options.getUser('user', true);
@@ -64,16 +66,10 @@ const Purge: Command = {
         const messagesToDelete = userMessages.first(count ?? 0);
         const deletedMessages = await interaction.channel.bulkDelete(messagesToDelete, true);
 
-        await interaction.reply({
-          content: `Successfully deleted ${deletedMessages.size} messages from ${user.tag}.`,
-          ephemeral: true,
-        });
+        await interaction.editReply(`Successfully deleted ${deletedMessages.size} messages from ${user.tag}.`);
       } catch (error) {
         logger.error(error);
-        await interaction.reply({
-          content: 'An error occurred while deleting messages.',
-          ephemeral: true,
-        });
+        await interaction.editReply('An error occurred while deleting messages.');
       }
     }
 
@@ -82,7 +78,7 @@ const Purge: Command = {
       const countOption = interaction.options.getInteger('count');
 
       if (!messageIdOption) {
-        await interaction.reply({ content: 'Invalid message ID.', ephemeral: true });
+        await interaction.editReply('Invalid message ID.');
         return;
       }
 
@@ -95,7 +91,7 @@ const Purge: Command = {
         const startIndex = messagesArray.findIndex((m) => m.id === messageId);
 
         if (startIndex === -1) {
-          await interaction.reply({ content: 'Message ID not found in the last 100 messages.', ephemeral: true });
+          await interaction.editReply('Message ID not found in the last 100 messages.');
           return;
         }
 
@@ -104,13 +100,10 @@ const Purge: Command = {
           messagesAfterSpecified.length > count ? messagesAfterSpecified.slice(0, count) : messagesAfterSpecified;
 
         await interaction.channel.bulkDelete(messagesToDelete, true);
-        await interaction.reply({
-          content: `Successfully deleted ${messagesToDelete.length} messages after the specified message.`,
-          ephemeral: true,
-        });
+        await interaction.editReply(`Successfully deleted ${messagesToDelete.length} messages after the specified message.`);
       } catch (error) {
         logger.error(error);
-        await interaction.reply({ content: 'An error occurred while deleting messages.', ephemeral: true });
+        await interaction.editReply('An error occurred while deleting messages.');
       }
     }
   },
