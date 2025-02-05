@@ -2,7 +2,21 @@ import { Interaction, EmbedBuilder, TextChannel } from 'discord.js';
 import Config from '../config';
 import logger from '../utils/logger';
 
-const commandWhitelist = new Set(['docs', 'issue', 'ox', 'ping', 'repo', 'guild', 'whois', 'warn']);
+const commandWhitelist = new Set([
+  'docs',
+  'issue',
+  'ox',
+  'ping',
+  'repo',
+  'guild',
+  'whois',
+  'warn',
+  'rps',
+  'coinflip',
+  'magic8ball',
+  'node',
+  'release',
+]);
 
 function getChannelMention(channel: TextChannel | null) {
   return channel ? `<#${channel.id}>` : 'Unknown Channel';
@@ -22,7 +36,9 @@ export async function onSlashCommand(interaction: Interaction) {
         .setTimestamp()
         .setFooter({ text: `User ID: ${interaction.user.id}` });
 
-      const logChannel = (await interaction.guild.channels.fetch(Config.LOG_CHANNEL).catch(logger.error)) as TextChannel;
+      const logChannel = (await interaction.guild.channels
+        .fetch(Config.LOG_CHANNEL)
+        .catch(logger.error)) as TextChannel;
       if (logChannel) {
         await logChannel.send({ embeds: [logEmbed] });
       } else {
