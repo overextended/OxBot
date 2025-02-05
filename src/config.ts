@@ -2,14 +2,20 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const CLIENT_ID = process.env.CLIENT_ID;
-const GUILD_ID = process.env.GUILD_ID;
-const DISCORD_TOKEN = process.env.TOKEN;
-const LOG_CHANNEL = process.env.LOG_CHANNEL;
-const MEMBER_ACTIVITY_CHANNEL = process.env.MEMBER_ACTIVITY_CHANNEL;
+const envVars = {
+  CLIENT_ID: process.env.CLIENT_ID,
+  GUILD_ID: process.env.GUILD_ID,
+  DISCORD_TOKEN: process.env.TOKEN,
+  LOG_CHANNEL: process.env.LOG_CHANNEL,
+  MEMBER_ACTIVITY_CHANNEL: process.env.MEMBER_ACTIVITY_CHANNEL
+};
 
-if (!DISCORD_TOKEN || !CLIENT_ID || !GUILD_ID || !LOG_CHANNEL || !MEMBER_ACTIVITY_CHANNEL) {
-  throw new Error('Missing environment variables');
+const missingVars = Object.entries(envVars)
+  .filter(([_, value]) => !value)
+  .map(([key]) => key);
+
+if (missingVars.length > 0) {
+  throw new Error(`Missing environment variables: ${missingVars.join(', ')}`);
 }
 
 interface Env {
@@ -21,11 +27,11 @@ interface Env {
 }
 
 const Config: Env = {
-  CLIENT_ID,
-  GUILD_ID,
-  DISCORD_TOKEN,
-  LOG_CHANNEL,
-  MEMBER_ACTIVITY_CHANNEL,
+  CLIENT_ID: envVars.CLIENT_ID!,
+  GUILD_ID: envVars.GUILD_ID!,
+  DISCORD_TOKEN: envVars.DISCORD_TOKEN!,
+  LOG_CHANNEL: envVars.LOG_CHANNEL!,
+  MEMBER_ACTIVITY_CHANNEL: envVars.MEMBER_ACTIVITY_CHANNEL!
 };
 
 export default Config;
