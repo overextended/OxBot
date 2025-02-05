@@ -1,5 +1,5 @@
 import { User, Guild, TextChannel, EmbedBuilder } from 'discord.js';
-import { log_channel } from '../settings.json';
+import Config from '../config';
 import logger from '../utils/logger';
 
 export async function handleMemberWarn(
@@ -32,9 +32,9 @@ export async function handleMemberWarn(
       warnEmbed.addFields({ name: 'Timeout Duration', value: durationText, inline: true });
     }
 
-    const channel = guild.channels.cache.get(log_channel) as TextChannel;
+    const channel = guild.channels.cache.get(Config.LOG_CHANNEL) as TextChannel;
     if (!channel) {
-      throw new Error(`Channel with ID ${log_channel} not found`);
+      throw new Error(`Channel with ID ${Config.LOG_CHANNEL} not found`);
     }
 
     await channel.send({ embeds: [warnEmbed] });

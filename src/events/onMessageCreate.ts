@@ -3,7 +3,7 @@ import { ignoredRoles, whitelistedChannels } from '../constants';
 import { positivePatterns, resourcePatterns } from '../utils/patterns';
 import { guidelineResponses, resourceResponses, cooldownResponses } from '../handlers/botResponsesHandler';
 import { Bot } from '..';
-import { log_channel } from '../settings.json';
+import Config from '../config';
 
 interface UserCooldownData {
   lastResponseTime: number;
@@ -72,7 +72,7 @@ async function sendCooldownLog(message: Message, lastResponseTime: number) {
     .setTimestamp()
     .setFooter({ text: `User ID: ${message.author.id}` });
 
-  const logChannel = Bot.channels.cache.get(log_channel) as TextChannel;
+  const logChannel = Bot.channels.cache.get(Config.LOG_CHANNEL) as TextChannel;
 
   if (logChannel) {
     try {

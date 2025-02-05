@@ -1,6 +1,6 @@
 import { Message, EmbedBuilder, PartialMessage, TextChannel, AuditLogEvent, Attachment } from 'discord.js';
 import { Bot } from '..';
-import { log_channel } from '../settings.json';
+import Config from '../config';
 import logger from '../utils/logger';
 
 export const onMessageDelete = async (message: Message | PartialMessage) => {
@@ -44,7 +44,7 @@ export const onMessageDelete = async (message: Message | PartialMessage) => {
     }
   });
 
-  const logChannel = Bot.channels.cache.get(log_channel) as TextChannel;
+  const logChannel = Bot.channels.cache.get(Config.LOG_CHANNEL) as TextChannel;
   if (logChannel) {
     try {
       logChannel.send({ embeds: [embed] });

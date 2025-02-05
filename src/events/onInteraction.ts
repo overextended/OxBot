@@ -1,6 +1,6 @@
 import { Interaction, TextChannel } from 'discord.js';
 import commands from '../handlers/commandHandler';
-import { log_channel } from '../settings.json';
+import Config from '../config';
 import logger from '../utils/logger';
 
 export const onInteraction = async (interaction: Interaction) => {
@@ -10,7 +10,7 @@ export const onInteraction = async (interaction: Interaction) => {
   if (!command) return;
 
   if (interaction.commandName === 'kick' || interaction.commandName === 'bulkunban') {
-    const logChannel = interaction.guild?.channels.cache.get(log_channel) as TextChannel;
+    const logChannel = interaction.guild?.channels.cache.get(Config.LOG_CHANNEL) as TextChannel;
     logChannel && logChannel.send(`${interaction.user.tag} used **${interaction.commandName}**!`);
   }
 

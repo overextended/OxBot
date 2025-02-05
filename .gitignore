@@ -4,3 +4,4 @@ build
 .env
 prisma/database.db
 prisma/database.db-journal
+*.sql

@@ -7,7 +7,8 @@
   "build": "pnpm tsc",
   "start": "pnpm node build/index.js",
   "start:production": "pnpm build && pnpm start",
-  "dev": "pnpm nodemon -L"
+  "dev": "pnpm nodemon -L",
+  "postinstall": "prisma generate"
 },
   "devDependencies": {
     "@types/node": "^20.14.12",

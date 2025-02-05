@@ -1,8 +1,8 @@
 import { GuildMember, PartialGuildMember, TextChannel } from 'discord.js';
-import { member_activity_channel } from '../settings.json';
+import Config from '../config';
 
 export const onMemberLeave = async (member: GuildMember | PartialGuildMember) => {
-  const channel = member.guild.channels.cache.get(member_activity_channel) as TextChannel;
+  const channel = member.guild.channels.cache.get(Config.MEMBER_ACTIVITY_CHANNEL) as TextChannel;
 
   if (!channel) return;
   if (member.partial) {

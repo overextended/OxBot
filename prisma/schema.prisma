@@ -17,10 +17,15 @@ model Warn {
 }
 
 model User {
-  id        String   @id
-  warns     Int      @default(0)
-  timeouts  Int      @default(0)
-  warnings  Warn[]   
+  id             String    @id
+  warns          Int       @default(0)
+  timeouts       Int       @default(0)
+  warnings       Warn[]   
+  messageCount   Int       @default(0)
+  lastMessageAt  DateTime? 
+  joinedAt       DateTime  @default(now())
+  riskScore      Int       @default(0)
+  lastScan       DateTime?
 }
 
 model Ban {

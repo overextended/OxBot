@@ -1,12 +1,13 @@
 import { GuildMember, TextChannel } from 'discord.js';
-import { member_activity_channel } from '../settings.json';
+import Config from '../config';
 import logger from '../utils/logger';
+import { assessAndWarnHighRiskUser } from '../utils/riskScoring';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 5 * 60 * 1000;
 
 export const onMemberJoin = async (member: GuildMember) => {
-  const channel = member.guild.channels.cache.get(member_activity_channel) as TextChannel;
+  const channel = member.guild.channels.cache.get(Config.MEMBER_ACTIVITY_CHANNEL) as TextChannel;
   if (!channel) return;
 
   const welcomeMessage = `Welcome <@${member.user.id}> (${member.user.username}) to the server!`;
@@ -31,8 +32,9 @@ export const onMemberJoin = async (member: GuildMember) => {
       retries++;
       if (retries < MAX_RETRIES) {
         logger.info(`Retrying in ${RETRY_DELAY / 1000} seconds...`);
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
       }
     }
   }
+  await assessAndWarnHighRiskUser(member, member.guild);
 };

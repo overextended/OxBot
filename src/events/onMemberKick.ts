@@ -1,5 +1,5 @@
 import { Guild, GuildAuditLogsEntry, EmbedBuilder, TextChannel, AuditLogEvent } from 'discord.js';
-import { log_channel } from '../settings.json';
+import Config from '../config';
 import logger from '../utils/logger';
 
 export const onMemberRemove = async (auditLogEntry: GuildAuditLogsEntry, guild: Guild) => {
@@ -36,6 +36,6 @@ export const onMemberRemove = async (auditLogEntry: GuildAuditLogsEntry, guild: 
     .setFooter({ text: `Member ID: ${targetUser.id}` })
     .setThumbnail(targetUser.displayAvatarURL());
 
-  const channel = guild.channels.cache.get(log_channel) as TextChannel;
+  const channel = guild.channels.cache.get(Config.LOG_CHANNEL) as TextChannel;
   channel && channel.send({ embeds: [removeEmbed] });
 };
