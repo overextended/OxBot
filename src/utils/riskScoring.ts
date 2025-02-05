@@ -221,38 +221,59 @@ export async function assessAndWarnHighRiskUser(member: GuildMember, guild: Guil
   try {
     logger.debug(`Starting high risk assessment for ${member.user.tag} (${member.id})`);
 
-    const textChannels = guild.channels.cache
-      .filter(
-        (channel) =>
-          channel.type === 0 && channel.viewable && channel.permissionsFor(guild.members.me!)?.has('ViewChannel')
-      )
-      .map((channel) => channel as TextChannel);
+    let textChannels: TextChannel[];
+    try {
+      textChannels = guild.channels.cache
+        .filter(
+          (channel) =>
+            channel.type === 0 && channel.viewable && channel.permissionsFor(guild.members.me!)?.has('ViewChannel')
+        )
+        .map((channel) => channel as TextChannel);
+      logger.debug(`Found ${textChannels.length} accessible text channels`);
+    } catch (error) {
+      logger.error(`Error getting text channels for ${member.id}:`, error);
+      return;
+    }
 
-    const assessment = await assessUserRisk(member, textChannels);
+    let assessment;
+    try {
+      assessment = await assessUserRisk(member, textChannels);
+    } catch (error) {
+      logger.error(`Error during risk assessment for ${member.id}:`, error);
+      return;
+    }
 
-    // Update user risk score in database - removed lastRiskUpdate field
-    await prisma.user.upsert({
-      where: { id: member.id },
-      update: {
-        riskScore: Math.round(assessment.score),
-      },
-      create: {
-        id: member.id,
-        riskScore: Math.round(assessment.score),
-        warns: 0,
-        timeouts: 0,
-        messageCount: 0,
-      },
-    });
+    try {
+      await prisma.user.upsert({
+        where: { id: member.id },
+        update: {
+          riskScore: Math.round(assessment.score),
+        },
+        create: {
+          id: member.id,
+          riskScore: Math.round(assessment.score),
+          warns: 0,
+          timeouts: 0,
+          messageCount: 0,
+        },
+      });
+      logger.debug(`Updated risk score in database for ${member.id}: ${assessment.score}`);
+    } catch (error) {
+      logger.error(`Error updating user risk score in database for ${member.id}:`, error);
+      return;
+    }
 
-    logger.debug(`Updated risk score in database for ${member.id}: ${assessment.score}`);
-
-    // If high risk (score > 80), issue warning
     if (assessment.score > 80) {
       try {
         const reason = `Potential High Risk User - Risk Score: ${Math.round(assessment.score)}%\nFactors:\n${assessment.factors.join('\n')}`;
 
-        const botMember = await guild.members.fetch(guild.client.user!.id);
+        let botMember;
+        try {
+          botMember = await guild.members.fetch(guild.client.user!.id);
+        } catch (error) {
+          logger.error(`Error fetching bot member for ${member.id}:`, error);
+          return;
+        }
 
         const warnResult = await warnUser(member, botMember, reason, true);
 
@@ -264,13 +285,13 @@ export async function assessAndWarnHighRiskUser(member: GuildMember, guild: Guil
           );
         }
       } catch (error) {
-        logger.error(`Failed to warn high-risk user ${member.id}:`, error);
+        logger.error(`Failed to warn high-risk user ${member.id}:`, error || 'No error details available');
       }
     } else {
       logger.debug(`User ${member.id} not high risk enough for warning (score: ${assessment.score})`);
     }
   } catch (error) {
-    logger.error(`Error in high risk assessment for ${member.id}:`, error);
+    logger.error(`Error in high risk assessment for ${member.id}:`, error || 'No error details available');
   }
 }
 
