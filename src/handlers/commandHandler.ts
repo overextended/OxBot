@@ -5,31 +5,21 @@ import logger from '../utils/logger';
 
 const commands = new Map<string, Command>();
 
-async function loadCommands(directory: string, isRoot = true): Promise<number> {
+function loadCommands(directory: string, isRoot = true): number {
   const commandFiles = fs.readdirSync(directory);
   let commandCount = 0;
 
   for (const file of commandFiles) {
     const fullPath = path.join(directory, file);
     if (fs.statSync(fullPath).isDirectory()) {
-      commandCount += await loadCommands(fullPath, false);
+      commandCount += loadCommands(fullPath, false);
     } else if (file.endsWith('.ts') || file.endsWith('.js')) {
       if (file === 'index.ts' || file === 'index.js') continue;
 
-      try {
-        const commandModule = await import(fullPath);
-        if (!commandModule.default) {
-          logger.warn(`Skipping ${file}: No default export found.`);
-          continue;
-        }
-
-        const command: Command = commandModule.default;
-        commands.set(command.data.name, command);
-        commandCount++;
-      } catch (error) {
-        const errorMessage = (error as Error).message;
-        logger.error(`Failed to load command ${file}: ${errorMessage}`);
-      }
+      const commandModule = require(fullPath);
+      const command: Command = commandModule.default;
+      commands.set(command.data.name, command);
+      commandCount++;
     }
   }
 
@@ -39,6 +29,6 @@ async function loadCommands(directory: string, isRoot = true): Promise<number> {
   return commandCount;
 }
 
-loadCommands(path.join(__dirname, '../commands')).catch((err) => logger.error(`Command loading failed: ${err.message}`));
+loadCommands(path.join(__dirname, '../commands'));
 
 export default commands;
