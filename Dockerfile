@@ -7,10 +7,12 @@ RUN apk add --no-cache openssl
 RUN npm install -g pnpm
 
 COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma/
+
 RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npx prisma migrate dev --name oxbot
+RUN npx prisma generate
 
 CMD [ "pnpm", "start:production" ]
