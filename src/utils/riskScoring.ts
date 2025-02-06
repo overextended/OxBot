@@ -238,28 +238,48 @@ export async function assessAndWarnHighRiskUser(member: GuildMember, guild: Guil
     let assessment;
     try {
       assessment = await assessUserRisk(member, textChannels);
+      logger.info(`Risk assessment score for ${member.user.tag}: ${assessment.score}`);
     } catch (error) {
       logger.error(`Error during risk assessment for ${member.id}:`, error);
       return;
     }
 
     try {
+      const roundedScore = Math.round(assessment.score);
+      logger.debug(`Attempting to update database for ${member.id} with score: ${roundedScore}`);
+
       await prisma.user.upsert({
-        where: { id: member.id },
-        update: {
-          riskScore: Math.round(assessment.score),
+        where: {
+          id: member.id,
         },
         create: {
           id: member.id,
-          riskScore: Math.round(assessment.score),
+          riskScore: roundedScore,
           warns: 0,
           timeouts: 0,
           messageCount: 0,
+          joinedAt: member.joinedAt || new Date(),
+          lastScan: new Date(),
+        },
+        update: {
+          riskScore: roundedScore,
+          lastScan: new Date(),
         },
       });
-      logger.debug(`Updated risk score in database for ${member.id}: ${assessment.score}`);
+
+      logger.info(`Successfully updated risk score for ${member.id}`);
     } catch (error) {
-      logger.error(`Error updating user risk score in database for ${member.id}:`, error);
+      logger.error('Database error:', {
+        userId: member.id,
+        error:
+          error instanceof Error
+            ? {
+                name: error.name,
+                message: error.message,
+                stack: error.stack,
+              }
+            : error,
+      });
       return;
     }
 
@@ -291,7 +311,7 @@ export async function assessAndWarnHighRiskUser(member: GuildMember, guild: Guil
       logger.debug(`User ${member.id} not high risk enough for warning (score: ${assessment.score})`);
     }
   } catch (error) {
-    logger.error(`Error in high risk assessment for ${member.id}:`, error || 'No error details available');
+    logger.error(`Unexpected error in assessAndWarnHighRiskUser for ${member.id}:`, error);
   }
 }
 

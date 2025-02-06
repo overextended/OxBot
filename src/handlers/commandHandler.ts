@@ -12,19 +12,34 @@ function loadCommands(directory: string, isRoot = true): number {
   for (const file of commandFiles) {
     const fullPath = path.join(directory, file);
     if (fs.statSync(fullPath).isDirectory()) {
-      commandCount += loadCommands(fullPath, false);
-    } else if (file.endsWith('.ts') || file.endsWith('.js')) {
-      if (file === 'index.ts' || file === 'index.js') continue;
+      const categoryName = file;
+      const categoryPath = fullPath;
 
-      const commandModule = require(fullPath);
-      const command: Command = commandModule.default;
-      commands.set(command.data.name, command);
-      commandCount++;
+      const files = fs.readdirSync(categoryPath).filter((f) => f.endsWith('.ts') || f.endsWith('.js'));
+
+      for (const commandFile of files) {
+        if (commandFile === 'index.ts' || commandFile === 'index.js') continue;
+
+        const commandPath = path.join(categoryPath, commandFile);
+        const commandModule = require(commandPath);
+        const command: Command = commandModule.default;
+
+        command.category = categoryName;
+
+        commands.set(command.data.name, command);
+        logger.debug(`Loading command: ${command.data.name} (${categoryName})`);
+        commandCount++;
+      }
     }
   }
 
   if (isRoot) {
     logger.info(`${commandCount} command(s) loaded`);
+    logger.debug(
+      `Loaded commands: ${Array.from(commands.entries())
+        .map(([name, cmd]) => `${name} (${cmd.category})`)
+        .join(', ')}`
+    );
   }
   return commandCount;
 }

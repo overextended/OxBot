@@ -7,7 +7,9 @@ const envVars = {
   GUILD_ID: process.env.GUILD_ID,
   DISCORD_TOKEN: process.env.TOKEN,
   LOG_CHANNEL: process.env.LOG_CHANNEL,
-  MEMBER_ACTIVITY_CHANNEL: process.env.MEMBER_ACTIVITY_CHANNEL
+  MEMBER_ACTIVITY_CHANNEL: process.env.MEMBER_ACTIVITY_CHANNEL,
+  MEMBER_ROLE_ID: process.env.MEMBER_ROLE_ID,
+  NODE_ENV: process.env.NODE_ENV || 'development',
 };
 
 const missingVars = Object.entries(envVars)
@@ -24,6 +26,8 @@ interface Env {
   GUILD_ID: string;
   LOG_CHANNEL: string;
   MEMBER_ACTIVITY_CHANNEL: string;
+  MEMBER_ROLE_ID: string;
+  NODE_ENV: string;
 }
 
 const Config: Env = {
@@ -31,7 +35,9 @@ const Config: Env = {
   GUILD_ID: envVars.GUILD_ID!,
   DISCORD_TOKEN: envVars.DISCORD_TOKEN!,
   LOG_CHANNEL: envVars.LOG_CHANNEL!,
-  MEMBER_ACTIVITY_CHANNEL: envVars.MEMBER_ACTIVITY_CHANNEL!
+  MEMBER_ACTIVITY_CHANNEL: envVars.MEMBER_ACTIVITY_CHANNEL!,
+  MEMBER_ROLE_ID: envVars.MEMBER_ROLE_ID!,
+  NODE_ENV: envVars.NODE_ENV,
 };
 
 export default Config;
