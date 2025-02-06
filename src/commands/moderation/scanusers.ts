@@ -8,7 +8,7 @@ import {
   EmbedBuilder,
   ChannelType,
 } from 'discord.js';
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
 import { assessAndWarnHighRiskUser } from '../../utils/riskScoring';
@@ -16,6 +16,209 @@ import Config from '../../config';
 
 const prisma = new PrismaClient();
 const SUSPICIOUS_PATTERNS = [/\d{4}$/, /^[a-zA-Z]\d{7}$/, /(.)\1{4,}/, /^[a-zA-Z0-9]+(bot|spam)$/i];
+
+interface RiskCategory {
+  range: string;
+  users: Array<{ member: GuildMember; risk: number; reason: string }>;
+  count: number;
+}
+
+interface RiskCategories {
+  high: RiskCategory; // 75-100%
+  medium: RiskCategory; // 50-74%
+  low: RiskCategory; // 25-49%
+  minimal: RiskCategory; // 0-24%
+}
+
+function categorizeResults(results: Array<{ member: GuildMember; risk: number; reason: string }>): RiskCategories {
+  const categories: RiskCategories = {
+    high: { range: '75-100%', users: [], count: 0 },
+    medium: { range: '50-74%', users: [], count: 0 },
+    low: { range: '25-49%', users: [], count: 0 },
+    minimal: { range: '0-24%', users: [], count: 0 },
+  };
+
+  results.forEach((result) => {
+    if (result.risk >= 75) {
+      categories.high.users.push(result);
+      categories.high.count++;
+    } else if (result.risk >= 50) {
+      categories.medium.users.push(result);
+      categories.medium.count++;
+    } else if (result.risk >= 25) {
+      categories.low.users.push(result);
+      categories.low.count++;
+    } else {
+      categories.minimal.users.push(result);
+      categories.minimal.count++;
+    }
+  });
+
+  return categories;
+}
+
+async function sendDetailedResults(
+  channel: TextChannel,
+  categories: RiskCategories,
+  filter: string,
+  initiator: string,
+  executionTime: number,
+  totalUsers: number
+): Promise<void> {
+  const totalHighMedium = categories.high.count + categories.medium.count;
+  const totalLowMinimal = categories.low.count + categories.minimal.count;
+
+  const embed = new EmbedBuilder()
+    .setTitle('Scan Summary')
+    .setColor(categories.high.count > 0 ? '#ff0000' : totalHighMedium > 0 ? '#ff9900' : '#00ff00')
+    .setDescription(
+      `**Filter:** ${filter}\n` +
+        `**Total users scanned:** ${totalUsers}\n\n` +
+        `**Execution Time:** ${executionTime.toFixed(2)} seconds\n\n` +
+        `**Risk Distribution**\n` +
+        `• High Risk (75-100%): ${categories.high.count} users\n` +
+        `• Medium Risk (50-74%): ${categories.medium.count} users\n` +
+        `• Lower Risk: ${totalLowMinimal} users below 50%`
+    )
+    .setFooter({ text: `Initiated by: ${initiator}` })
+    .setTimestamp();
+
+  await channel.send({ embeds: [embed] });
+}
+
+async function scanUsers(
+  guild: Guild,
+  filter: string,
+  limit: number,
+  interaction?: ChatInputCommandInteraction
+): Promise<Array<{ member: GuildMember; risk: number; reason: string }>> {
+  const now = Date.now();
+  const suspiciousUsers: Array<{ member: GuildMember; risk: number; reason: string }> = [];
+
+  try {
+    await interaction?.editReply('Fetching members...');
+    const members = await guild.members.fetch({ limit });
+    const memberArray = Array.from(members.values());
+    const totalMembers = memberArray.length;
+
+    logger.info(`Starting scan with filter: ${filter}, total members: ${totalMembers}`);
+    await interaction?.editReply(`Found ${totalMembers} members to scan. Starting scan...`);
+
+    for (let i = 0; i < memberArray.length; i++) {
+      if (suspiciousUsers.length >= limit) break;
+
+      const member = memberArray[i];
+      if (member.user.bot) continue;
+
+      if (interaction && i % 5 === 0) {
+        const progress = Math.round((i / totalMembers) * 100);
+        await interaction
+          .editReply(
+            `Scanning users: ${progress}% complete (${i}/${totalMembers})\nSuspicious users found: ${suspiciousUsers.length}`
+          )
+          .catch((error) => logger.error('Failed to update progress:', error));
+      }
+
+      try {
+        if (filter === 'risk') {
+          await prisma.user.upsert({
+            where: { id: member.id },
+            create: {
+              id: member.id,
+              warns: 0,
+              timeouts: 0,
+              messageCount: 0,
+              joinedAt: member.joinedAt || new Date(),
+              riskScore: 0,
+              lastScan: new Date(),
+            },
+            update: {
+              lastScan: new Date(),
+            },
+          });
+        } else {
+          await prisma.user.upsert({
+            where: { id: member.id },
+            create: {
+              id: member.id,
+              warns: 0,
+              timeouts: 0,
+              messageCount: 0,
+              joinedAt: member.joinedAt || new Date(),
+              riskScore: 0,
+              lastScan: new Date(),
+            },
+            update: {
+              lastScan: new Date(),
+              joinedAt: member.joinedAt || undefined,
+            },
+          });
+        }
+
+        switch (filter) {
+          case 'new':
+            const joinTime = member.joinedTimestamp || 0;
+            const hoursSinceJoin = (now - joinTime) / (1000 * 60 * 60);
+            if (hoursSinceJoin <= 24) {
+              suspiciousUsers.push({ member, risk: 1, reason: 'New join' });
+              logger.debug(`Found new join: ${member.user.tag}`);
+            }
+            break;
+
+          case 'silent':
+            const userData = await prisma.user.findUnique({
+              where: { id: member.id },
+              select: { messageCount: true },
+            });
+            if (!userData || userData.messageCount === 0) {
+              suspiciousUsers.push({ member, risk: 2, reason: 'No messages' });
+              logger.debug(`Found silent user: ${member.user.tag}`);
+            }
+            break;
+
+          case 'names':
+            if (SUSPICIOUS_PATTERNS.some((pattern) => pattern.test(member.user.username))) {
+              suspiciousUsers.push({ member, risk: 2, reason: 'Suspicious username' });
+              logger.debug(`Found suspicious username: ${member.user.tag}`);
+            }
+            break;
+
+          case 'risk':
+            logger.debug(`Assessing risk for user: ${member.user.tag}`);
+            await assessAndWarnHighRiskUser(member, guild);
+
+            const userRisk = await prisma.user.findUnique({
+              where: { id: member.id },
+              select: { riskScore: true },
+            });
+
+            if (userRisk && userRisk.riskScore > 3) {
+              suspiciousUsers.push({
+                member,
+                risk: userRisk.riskScore,
+                reason: 'High risk score',
+              });
+              logger.debug(`Found high risk user: ${member.user.tag} (Score: ${userRisk.riskScore})`);
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            break;
+        }
+      } catch (memberError) {
+        logger.error(`Error processing member ${member.id} with filter ${filter}:`, memberError);
+        continue;
+      }
+    }
+
+    logger.info(`Scan complete. Found ${suspiciousUsers.length} suspicious users`);
+    await interaction?.editReply('Scan complete! Preparing results...');
+
+    return suspiciousUsers.sort((a, b) => b.risk - a.risk);
+  } catch (error) {
+    logger.error('Error during scan:', error);
+    throw error;
+  }
+}
 
 const ScanUsers: Command = {
   data: new SlashCommandBuilder()
@@ -68,12 +271,35 @@ const ScanUsers: Command = {
         return;
       }
 
-      const summaryEmbed = createSummaryEmbed(results, filter, scanStartTime);
+      const categories = categorizeResults(results);
+      const executionTime = (Date.now() - scanStartTime) / 1000;
+      const totalUsers = results.length;
 
-      await sendDetailedResults(logChannel, results, filter, interaction.user.tag);
+      await sendDetailedResults(logChannel, categories, filter, interaction.user.tag, executionTime, totalUsers);
+
+      const embed = new EmbedBuilder()
+        .setTitle('Scan Summary')
+        .setColor(
+          categories.high.count > 0
+            ? '#ff0000'
+            : categories.high.count + categories.medium.count > 0
+              ? '#ff9900'
+              : '#00ff00'
+        )
+        .setDescription(
+          `**Filter:** ${filter}\n` +
+            `**Total users scanned:** ${totalUsers}\n\n` +
+            `**Execution Time:** ${executionTime.toFixed(2)} seconds\n\n` +
+            `**Risk Distribution**\n` +
+            `• High Risk (75-100%): ${categories.high.count} users\n` +
+            `• Medium Risk (50-74%): ${categories.medium.count} users\n` +
+            `• Lower Risk: ${categories.low.count + categories.minimal.count} users below 50%`
+        )
+        .setTimestamp();
+
       await interaction.editReply({
         content: `Scan complete! Detailed results have been sent to ${logChannel}`,
-        embeds: [summaryEmbed],
+        embeds: [embed],
       });
     } catch (error) {
       logger.error('Error in scanusers command:', error);
@@ -81,231 +307,5 @@ const ScanUsers: Command = {
     }
   },
 };
-
-function createSummaryEmbed(
-  results: Array<{ member: GuildMember; risk: number; reason: string }>,
-  filter: string,
-  startTime: number
-): EmbedBuilder {
-  const executionTime = ((Date.now() - startTime) / 1000).toFixed(2);
-
-  const reasonCounts = results.reduce(
-    (acc, { reason }) => {
-      acc[reason] = (acc[reason] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
-
-  const embed = new EmbedBuilder()
-    .setTitle('Scan Summary')
-    .setColor('#ff9900')
-    .setDescription(`Filter: ${filter}\nTotal suspicious users: ${results.length}`)
-    .addFields(
-      { name: 'Execution Time', value: `${executionTime} seconds`, inline: true },
-      {
-        name: 'Average Risk Score',
-        value: (results.reduce((acc, r) => acc + r.risk, 0) / results.length).toFixed(2),
-        inline: true,
-      }
-    )
-    .setTimestamp();
-
-  for (const [reason, count] of Object.entries(reasonCounts)) {
-    embed.addFields({ name: reason, value: count.toString(), inline: true });
-  }
-
-  return embed;
-}
-
-async function sendDetailedResults(
-  channel: TextChannel,
-  results: Array<{ member: GuildMember; risk: number; reason: string }>,
-  filter: string,
-  initiator: string
-) {
-  await channel.send({
-    embeds: [new EmbedBuilder()
-      .setTitle('Detailed Scan Results')
-      .setDescription(`Filter: ${filter}\nInitiated by: ${initiator}\nTotal results: ${results.length}`)
-      .setColor('#ff9900')
-      .setTimestamp()]
-  });
-
-  const USERS_PER_EMBED = 10;
-  const totalEmbeds = Math.ceil(results.length / USERS_PER_EMBED);
-
-  for (let i = 0; i < results.length; i += USERS_PER_EMBED) {
-    const batch = results.slice(i, i + USERS_PER_EMBED);
-    const embedNumber = Math.floor(i / USERS_PER_EMBED) + 1;
-    
-    const batchEmbed = new EmbedBuilder()
-      .setTitle(`Results (Page ${embedNumber}/${totalEmbeds})`)
-      .setDescription(`Users ${i + 1}-${Math.min(i + USERS_PER_EMBED, results.length)} of ${results.length}`)
-      .setColor('#ff9900');
-
-    batch.forEach((result, index) => {
-      batchEmbed.addFields({
-        name: `${i + index + 1}. ${result.member.user.tag}`,
-        value: [
-          `ID: ${result.member.id}`,
-          `Risk Score: ${result.risk}`,
-          `Reason: ${result.reason}`,
-          `Joined: ${result.member.joinedAt?.toLocaleString() || 'Unknown'}`,
-          `Account Created: ${result.member.user.createdAt.toLocaleString()}`
-        ].join('\n')
-      });
-    });
-
-    await channel.send({ embeds: [batchEmbed] });
-    
-    if (embedNumber < totalEmbeds) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-  }
-
-  await channel.send({
-    embeds: [new EmbedBuilder()
-      .setTitle('End of Results')
-      .setDescription(`Completed sending ${results.length} results across ${totalEmbeds} pages.`)
-      .setColor('#ff9900')
-      .setTimestamp()]
-  });
-}
-
-async function getOrCreateUser(userId: string): Promise<{ messageCount: number; riskScore: number } | null> {
-  try {
-    let user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { messageCount: true, riskScore: true },
-    });
-
-    if (!user) {
-      try {
-        user = await prisma.user.create({
-          data: {
-            id: userId,
-            warns: 0,
-            timeouts: 0,
-            messageCount: 0,
-            riskScore: 0,
-          },
-          select: { messageCount: true, riskScore: true },
-        });
-      } catch (createError) {
-        if (createError instanceof Prisma.PrismaClientKnownRequestError) {
-          // P2002 is for unique constraint violations
-          if (createError.code === 'P2002') {
-            user = await prisma.user.findUnique({
-              where: { id: userId },
-              select: { messageCount: true, riskScore: true },
-            });
-          }
-        }
-        if (!user) {
-          logger.error(`Failed to create/fetch user ${userId}:`, createError);
-          return null;
-        }
-      }
-    }
-
-    return user;
-  } catch (error) {
-    logger.error(`Database error for user ${userId}:`, error);
-    return null;
-  }
-}
-
-async function scanUsers(
-  guild: Guild,
-  filter: string,
-  limit: number,
-  interaction?: ChatInputCommandInteraction
-): Promise<Array<{ member: GuildMember; risk: number; reason: string }>> {
-  const now = Date.now();
-  const suspiciousUsers: Array<{ member: GuildMember; risk: number; reason: string }> = [];
-
-  try {
-    await interaction?.editReply('Fetching members...');
-    const members = await guild.members.fetch({ limit });
-    const memberArray = Array.from(members.values());
-    const totalMembers = memberArray.length;
-
-    logger.info(`Starting scan with filter: ${filter}, total members: ${totalMembers}`);
-    await interaction?.editReply(`Found ${totalMembers} members to scan. Starting scan...`);
-
-    for (let i = 0; i < memberArray.length; i++) {
-      if (suspiciousUsers.length >= limit) break;
-
-      const member = memberArray[i];
-      if (member.user.bot) continue;
-
-      if (interaction && i % 5 === 0) {
-        const progress = Math.round((i / totalMembers) * 100);
-        await interaction
-          .editReply(
-            `Scanning users: ${progress}% complete (${i}/${totalMembers})\nSuspicious users found: ${suspiciousUsers.length}`
-          )
-          .catch((error) => logger.error('Failed to update progress:', error));
-      }
-
-      try {
-        switch (filter) {
-          case 'new':
-            const joinTime = member.joinedTimestamp || 0;
-            const hoursSinceJoin = (now - joinTime) / (1000 * 60 * 60);
-            if (hoursSinceJoin <= 24) {
-              suspiciousUsers.push({ member, risk: 1, reason: 'New join' });
-              logger.debug(`Found new join: ${member.user.tag}`);
-            }
-            break;
-
-          case 'silent':
-            const userData = await getOrCreateUser(member.id);
-            if (userData?.messageCount === 0) {
-              suspiciousUsers.push({ member, risk: 2, reason: 'No messages' });
-              logger.debug(`Found silent user: ${member.user.tag}`);
-            }
-            break;
-
-          case 'names':
-            if (SUSPICIOUS_PATTERNS.some((pattern) => pattern.test(member.user.username))) {
-              suspiciousUsers.push({ member, risk: 2, reason: 'Suspicious username' });
-              logger.debug(`Found suspicious username: ${member.user.tag}`);
-            }
-            break;
-
-          case 'risk':
-            logger.debug(`Assessing risk for user: ${member.user.tag}`);
-            await assessAndWarnHighRiskUser(member, guild);
-
-            const userRisk = await getOrCreateUser(member.id);
-            if (userRisk && userRisk.riskScore > 3) {
-              suspiciousUsers.push({
-                member,
-                risk: userRisk.riskScore,
-                reason: 'High risk score',
-              });
-              logger.debug(`Found high risk user: ${member.user.tag} (Score: ${userRisk.riskScore})`);
-            }
-
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            break;
-        }
-      } catch (memberError) {
-        logger.error(`Error processing member ${member.id} with filter ${filter}:`, memberError);
-        continue;
-      }
-    }
-
-    logger.info(`Scan complete. Found ${suspiciousUsers.length} suspicious users`);
-    await interaction?.editReply('Scan complete! Preparing results...');
-
-    return suspiciousUsers.sort((a, b) => b.risk - a.risk);
-  } catch (error) {
-    logger.error('Error during scan:', error);
-    throw error;
-  }
-}
 
 export default ScanUsers;
