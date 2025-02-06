@@ -3,35 +3,41 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./database.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model Warn {
   id        Int      @id @default(autoincrement())
-  reason    String
-  issuerId  String
-  targetId  String
-  issuedAt  DateTime @default(now())
+  reason    String   @db.Text
+  issuerId  String   @db.VarChar(255)
+  targetId  String   @db.VarChar(255)
+  issuedAt  DateTime @default(now()) @db.Timestamp
   User      User     @relation(fields: [targetId], references: [id])
+
+  @@index([targetId])
 }
 
 model User {
-  id             String    @id
+  id             String    @id @db.VarChar(255)
   warns          Int       @default(0)
   timeouts       Int       @default(0)
   warnings       Warn[]   
   messageCount   Int       @default(0)
-  lastMessageAt  DateTime? 
-  joinedAt       DateTime  @default(now())
+  lastMessageAt  DateTime? @db.Timestamp
+  joinedAt       DateTime  @default(now()) @db.Timestamp
   riskScore      Int       @default(0)
-  lastScan       DateTime?
+  lastScan       DateTime? @db.Timestamp
+
+  @@index([riskScore])
 }
 
 model Ban {
   id           Int      @id @default(autoincrement())
-  reason       String
-  issuerId     String
-  targetId     String
-  issuedAt     DateTime @default(now())
+  reason       String   @db.Text
+  issuerId     String   @db.VarChar(255)
+  targetId     String   @db.VarChar(255)
+  issuedAt     DateTime @default(now()) @db.Timestamp
+
+  @@index([targetId])
 }
