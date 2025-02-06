@@ -179,6 +179,15 @@ async function scanUsers(
             const usernameRisk = calculateUsernameRiskScore(member.user.username);
             if (usernameRisk.score > 0) {
               const riskScore = usernameRisk.score * 100;
+
+              await prisma.user.update({
+                where: { id: member.id },
+                data: {
+                  riskScore: Math.round(riskScore),
+                  lastScan: new Date(),
+                },
+              });
+
               suspiciousUsers.push({
                 member,
                 risk: riskScore,
