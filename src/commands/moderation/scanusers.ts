@@ -198,24 +198,54 @@ async function scanUsers(
             break;
 
           case 'risk':
-            logger.debug(`Assessing risk for user: ${member.user.tag}`);
-            await assessAndWarnHighRiskUser(member, guild);
-
-            const userRisk = await prisma.user.findUnique({
-              where: { id: member.id },
-              select: { riskScore: true },
-            });
-
-            if (userRisk && userRisk.riskScore > 3) {
-              suspiciousUsers.push({
-                member,
-                risk: userRisk.riskScore,
-                reason: 'High risk score',
+            try {
+              const userRisk = await prisma.user.findUnique({
+                where: { id: member.id },
+                select: {
+                  riskScore: true,
+                  messageCount: true,
+                  lastScan: true,
+                },
               });
-              logger.debug(`Found high risk user: ${member.user.tag} (Score: ${userRisk.riskScore})`);
-            }
 
-            await new Promise((resolve) => setTimeout(resolve, 500));
+              const needsScan = !userRisk?.lastScan || Date.now() - userRisk.lastScan.getTime() > 24 * 60 * 60 * 1000;
+
+              if (needsScan) {
+                logger.debug(`Full risk assessment for user: ${member.user.tag}`);
+                await assessAndWarnHighRiskUser(member, guild);
+
+                const updatedRisk = await prisma.user.findUnique({
+                  where: { id: member.id },
+                  select: { riskScore: true },
+                });
+
+                if (updatedRisk && updatedRisk.riskScore >= 50) {
+                  suspiciousUsers.push({
+                    member,
+                    risk: updatedRisk.riskScore,
+                    reason: 'High risk score (new assessment)',
+                  });
+                }
+              } else if (userRisk && userRisk.riskScore >= 50) {
+                suspiciousUsers.push({
+                  member,
+                  risk: userRisk.riskScore,
+                  reason: 'High risk score (existing)',
+                });
+              }
+
+              if (i % 10 === 0) {
+                await interaction?.editReply(
+                  `Scanning users: ${Math.round((i / totalMembers) * 100)}% complete ` +
+                    `(${i}/${totalMembers})\n` +
+                    `High risk users found: ${suspiciousUsers.length}`
+                );
+              }
+
+              await new Promise((resolve) => setTimeout(resolve, 100));
+            } catch (error) {
+              logger.error(`Error assessing risk for ${member.id}:`, error);
+            }
             break;
         }
       } catch (memberError) {
