@@ -11,11 +11,10 @@ import {
 import { PrismaClient } from '@prisma/client';
 import { Command } from '../../interfaces/command';
 import logger from '../../utils/logger';
-import { assessAndWarnHighRiskUser } from '../../utils/riskScoring';
+import { assessAndWarnHighRiskUser, calculateUsernameRiskScore } from '../../utils/riskScoring';
 import Config from '../../config';
 
 const prisma = new PrismaClient();
-const SUSPICIOUS_PATTERNS = [/\d{4}$/, /^[a-zA-Z]\d{7}$/, /(.)\1{4,}/, /^[a-zA-Z0-9]+(bot|spam)$/i];
 
 interface RiskCategory {
   range: string;
@@ -177,9 +176,15 @@ async function scanUsers(
             break;
 
           case 'names':
-            if (SUSPICIOUS_PATTERNS.some((pattern) => pattern.test(member.user.username))) {
-              suspiciousUsers.push({ member, risk: 2, reason: 'Suspicious username' });
-              logger.debug(`Found suspicious username: ${member.user.tag}`);
+            const usernameRisk = calculateUsernameRiskScore(member.user.username);
+            if (usernameRisk.score > 0) {
+              const riskScore = usernameRisk.score * 100;
+              suspiciousUsers.push({
+                member,
+                risk: riskScore,
+                reason: usernameRisk.factors[0] || 'Suspicious username pattern',
+              });
+              logger.debug(`Found suspicious username pattern: ${member.user.tag} (Score: ${riskScore})`);
             }
             break;
 

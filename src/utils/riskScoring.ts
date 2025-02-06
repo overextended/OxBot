@@ -37,12 +37,20 @@ const RISK_WEIGHTS: RiskFactors = {
 };
 
 const USERNAME_PATTERNS = {
-  randomLetterNumber: /^[a-z0-9]{8,}$/i,
-  excessiveNumbers: /\d{4,}/,
-  suspiciousWords: /(bot|spam|nitro|free|giveaway|discord\.gift)/i,
-  noLetters: /^[^a-z]*$/i,
-  repeatingChars: /(.)\1{4,}/,
-  leetSpeak: /[0-9]+[a-z]+[0-9]+[a-z]+/i,
+  // High risk patterns (75+ risk score)
+  high: [
+    /_\d{5,}$/, // Underscore followed by 5 or more digits at the end
+    /^[a-zA-Z]\d{7}$/, // Single letter followed by exactly 7 digits
+    /^[a-zA-Z0-9]+(bot|spam)$/i, // Bot or spam in username
+    /(nitro|free|giveaway|discord\.gift)/i, // Common scam words
+  ],
+  // Medium risk patterns (50-74 risk score)
+  medium: [
+    /(.)\1{4,}/, // Same character repeated 5+ times
+    /^[a-z0-9]{8,}$/i, // Random letters and numbers
+    /^[^a-z]*$/i, // No letters
+    /[0-9]+[a-z]+[0-9]+[a-z]+/i, // Alternating numbers and letters
+  ],
 };
 
 async function checkPriorKicks(member: GuildMember): Promise<number> {
@@ -113,16 +121,29 @@ async function analyzeMessageContent(messages: Message[]): Promise<{
 
 function calculateUsernameRiskScore(username: string): { score: number; factors: string[] } {
   const factors: string[] = [];
-  let score = 0;
+  let highestScore = 0;
 
-  for (const [pattern, regex] of Object.entries(USERNAME_PATTERNS)) {
-    if (regex.test(username)) {
-      score += 0.2;
-      factors.push(`Suspicious username pattern: ${pattern}`);
+  // Check high risk patterns first
+  for (const pattern of USERNAME_PATTERNS.high) {
+    if (pattern.test(username)) {
+      highestScore = 0.75; // 75% risk score
+      factors.push('High risk username pattern detected');
+      break;
     }
   }
 
-  return { score: Math.min(score, 1), factors };
+  // Check medium risk patterns if no high risk patterns found
+  if (highestScore === 0) {
+    for (const pattern of USERNAME_PATTERNS.medium) {
+      if (pattern.test(username)) {
+        highestScore = 0.5; // 50% risk score
+        factors.push('Suspicious username pattern detected');
+        break;
+      }
+    }
+  }
+
+  return { score: highestScore, factors };
 }
 
 async function assessUserRisk(member: GuildMember, textChannels: TextChannel[]): Promise<RiskAssessment> {
@@ -315,4 +336,4 @@ export async function assessAndWarnHighRiskUser(member: GuildMember, guild: Guil
   }
 }
 
-export { assessUserRisk, RiskAssessment };
+export { assessUserRisk, RiskAssessment, calculateUsernameRiskScore };
