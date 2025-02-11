@@ -85,7 +85,7 @@ async function sendDetailedResults(
   await channel.send({ embeds: [embed] });
 }
 
-async function scanUsers(
+async function riskScan(
   guild: Guild,
   filter: string,
   limit: number,
@@ -264,9 +264,9 @@ async function scanUsers(
   }
 }
 
-const ScanUsers: Command = {
+const RiskScan: Command = {
   data: new SlashCommandBuilder()
-    .setName('scanusers')
+    .setName('riskscan')
     .setDescription('Scan server members for potential spam accounts')
     .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
     .addStringOption((option) =>
@@ -308,7 +308,7 @@ const ScanUsers: Command = {
       }
 
       const scanStartTime = Date.now();
-      const results = await scanUsers(interaction.guild, filter, limit, interaction);
+      const results = await riskScan(interaction.guild, filter, limit, interaction);
 
       if (results.length === 0) {
         await interaction.editReply(`No suspicious users found using filter: ${filter}`);
@@ -346,10 +346,10 @@ const ScanUsers: Command = {
         embeds: [embed],
       });
     } catch (error) {
-      logger.error('Error in scanusers command:', error);
+      logger.error('Error in riskscan command:', error);
       await interaction.editReply('An error occurred while scanning users. Please try again later.');
     }
   },
 };
 
-export default ScanUsers;
+export default RiskScan;
