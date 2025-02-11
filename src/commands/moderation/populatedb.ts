@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Guild, GuildMember, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
+import { ChatInputCommandInteraction, GuildMember, SlashCommandBuilder, PermissionFlagsBits } from 'discord.js';
 import { Command } from '../../interfaces/command';
 import { PrismaClient } from '@prisma/client';
 import logger from '../../utils/logger';
