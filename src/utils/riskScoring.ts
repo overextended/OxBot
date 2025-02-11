@@ -39,10 +39,14 @@ const RISK_WEIGHTS: RiskFactors = {
 const USERNAME_PATTERNS = {
   // High risk patterns (75+ risk score)
   high: [
-    /_\d{5,}$/, // Underscore followed by 5 or more digits at the end
+    /_\d{4,}$/, // Underscore followed by 4+ digits at end (common bot pattern)
+    /\d{4,}_\d{4,}/, // Multiple number groups with underscore
     /^[a-zA-Z]\d{7}$/, // Single letter followed by exactly 7 digits
     /^[a-zA-Z0-9]+(bot|spam)$/i, // Bot or spam in username
     /(nitro|free|giveaway|discord\.gift)/i, // Common scam words
+    /\d{5,}$/, // 5+ digits at end of name
+    /^[a-z]+\d{5,}/i, // Word followed by 5+ digits
+    /^[a-z]+\d{2,}_\d{4,}/i, // Word + numbers + underscore + 4+ digits
   ],
   // Medium risk patterns (50-74 risk score)
   medium: [
@@ -50,6 +54,8 @@ const USERNAME_PATTERNS = {
     /^[a-z0-9]{8,}$/i, // Random letters and numbers
     /^[^a-z]*$/i, // No letters
     /[0-9]+[a-z]+[0-9]+[a-z]+/i, // Alternating numbers and letters
+    /^[a-z]{1,3}\d{2,}/i, // Short word (1-3 chars) followed by numbers
+    /\d{2,}[a-z]{1,3}\d{2,}/i, // Numbers + short word + numbers
   ],
 };
 
