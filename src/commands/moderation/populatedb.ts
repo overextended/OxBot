@@ -9,8 +9,21 @@ const BATCH_SIZE = 100;
 const DELAY_BETWEEN_BATCHES = 5000;
 const DELAY_BETWEEN_USERS = 100;
 
-async function processUserBatch(members: GuildMember[], interaction: ChatInputCommandInteraction) {
-  let processed = 0;
+interface ProcessResult {
+  success: number;
+  failed: number;
+  errors: string[];
+}
+
+async function processUserBatch(
+  members: GuildMember[],
+  interaction: ChatInputCommandInteraction
+): Promise<ProcessResult> {
+  const result: ProcessResult = {
+    success: 0,
+    failed: 0,
+    errors: [],
+  };
 
   for (const member of members) {
     try {
@@ -28,21 +41,30 @@ async function processUserBatch(members: GuildMember[], interaction: ChatInputCo
         update: {},
       });
 
-      processed++;
+      result.success++;
 
-      if (processed % 10 === 0) {
-        await interaction.editReply({
-          content: `Processing batch: ${processed}/${members.length} users in current batch`,
-        });
+      if (result.success % 10 === 0) {
+        await interaction
+          .editReply({
+            content:
+              `Processing batch: ${result.success + result.failed}/${members.length} users\n` +
+              `Success: ${result.success} | Failed: ${result.failed}`,
+          })
+          .catch((err) => {
+            logger.error('Failed to update progress:', err);
+          });
       }
 
       await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_USERS));
     } catch (error) {
+      result.failed++;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      result.errors.push(`Failed to process user ${member.id}: ${errorMessage}`);
       logger.error(`Error processing user ${member.id}:`, error);
     }
   }
 
-  return processed;
+  return result;
 }
 
 const PopulateDB: Command = {
@@ -53,21 +75,34 @@ const PopulateDB: Command = {
 
   async run(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) {
-      await interaction.reply({ content: 'This command can only be used in a guild.', ephemeral: true });
+      await interaction.reply({
+        content: 'This command can only be used in a guild.',
+        ephemeral: true,
+      });
       return;
     }
 
     await interaction.deferReply({ ephemeral: true });
 
     try {
-      const guild = interaction.guild;
-      let members = await guild.members.fetch();
+      let members;
+
+      try {
+        members = await interaction.guild.members.fetch();
+      } catch (error) {
+        logger.error('Failed to fetch guild members:', error);
+        await interaction.editReply('Failed to fetch guild members. Please try again.');
+        return;
+      }
+
       const totalMembers = members.size;
 
       logger.info(`Starting database population for ${totalMembers} members`);
       await interaction.editReply(`Starting database population for ${totalMembers} members...`);
 
-      let processedTotal = 0;
+      let totalSuccess = 0;
+      let totalFailed = 0;
+      const allErrors: string[] = [];
       const memberArray = Array.from(members.values());
 
       for (let i = 0; i < memberArray.length; i += BATCH_SIZE) {
@@ -75,26 +110,58 @@ const PopulateDB: Command = {
         const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
         const totalBatches = Math.ceil(memberArray.length / BATCH_SIZE);
 
-        await interaction.editReply({
-          content: `Processing batch ${batchNumber}/${totalBatches}\nTotal progress: ${processedTotal}/${totalMembers} members`,
-        });
+        try {
+          await interaction.editReply({
+            content:
+              `Processing batch ${batchNumber}/${totalBatches}\n` +
+              `Total progress: ${i}/${totalMembers} members\n` +
+              `Success: ${totalSuccess} | Failed: ${totalFailed}`,
+          });
 
-        const processed = await processUserBatch(batch, interaction);
-        processedTotal += processed;
+          const batchResult = await processUserBatch(batch, interaction);
 
-        if (i + BATCH_SIZE < memberArray.length) {
-          await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_BATCHES));
+          totalSuccess += batchResult.success;
+          totalFailed += batchResult.failed;
+          allErrors.push(...batchResult.errors);
+
+          if (i + BATCH_SIZE < memberArray.length) {
+            await new Promise((resolve) => setTimeout(resolve, DELAY_BETWEEN_BATCHES));
+          }
+        } catch (error) {
+          logger.error(`Error processing batch ${batchNumber}:`, error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          allErrors.push(`Batch ${batchNumber} failed: ${errorMessage}`);
         }
       }
 
-      await interaction.editReply({
-        content: `Database population complete!\nProcessed ${processedTotal}/${totalMembers} members successfully.`,
-      });
+      const finalMessage =
+        `Database population complete!\n` +
+        `Total processed: ${totalSuccess + totalFailed}/${totalMembers}\n` +
+        `Successful: ${totalSuccess}\n` +
+        `Failed: ${totalFailed}`;
 
-      logger.info(`Database population complete. Processed ${processedTotal}/${totalMembers} members`);
+      // Log errors if any
+      if (allErrors.length > 0) {
+        const errorLog =
+          allErrors.slice(0, 10).join('\n') +
+          (allErrors.length > 10 ? `\n...and ${allErrors.length - 10} more errors` : '');
+        logger.error('Population errors:', errorLog);
+      }
+
+      await interaction.editReply(finalMessage);
+      logger.info(`Database population complete. Success: ${totalSuccess}, Failed: ${totalFailed}`);
     } catch (error) {
       logger.error('Error in populatedb command:', error);
-      await interaction.editReply('An error occurred while populating the database.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+
+      if (interaction.deferred) {
+        await interaction.editReply(`An error occurred while populating the database: ${errorMessage}`);
+      } else {
+        await interaction.reply({
+          content: `An error occurred while populating the database: ${errorMessage}`,
+          ephemeral: true,
+        });
+      }
     }
   },
 };
