@@ -11,6 +11,7 @@ import { onMemberJoin } from './events/onMemberJoin';
 import { onMemberLeave } from './events/onMemberLeave';
 import { onMessageDeleteBulk } from './events/onPurge';
 import { onSlashCommand } from './events/onSlashCommand';
+import { onMemberRoleUpdate } from './events/onMemberRoleUpdate';
 
 export const Bot = new Client({
   intents: [
@@ -34,6 +35,9 @@ Bot.on(Events.GuildAuditLogEntryCreate, async (auditLogEntry, guild) => {
       break;
     case AuditLogEvent.MemberKick:
       await onMemberRemove(auditLogEntry, guild);
+      break;
+    case AuditLogEvent.MemberRoleUpdate:
+      await onMemberRoleUpdate(auditLogEntry, guild);
       break;
     default:
       break;
