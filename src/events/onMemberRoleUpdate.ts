@@ -13,15 +13,28 @@ export const onMemberRoleUpdate = async (auditLogEntry: GuildAuditLogsEntry, gui
 
   if (auditLogEntry.executorId !== '874059310869655662') return; // Only trigger if it's VVarden
 
-  const targetUser = await guild.members.fetch(auditLogEntry.targetId);
+  logger.info(`Fetching member: ${auditLogEntry.targetId}`);
+
+  let targetUser;
+  try {
+    targetUser = await guild.members.fetch(auditLogEntry.targetId);
+  } catch (error) {
+    return logger.info(`Target user ${auditLogEntry.targetId} not found, possibly left.`);
+  }
 
   if (!targetUser) {
-    return logger.info('Unable to find targetUser following MemberRoleUpdate triggering by VVarden')
+    return logger.info('Unable to find targetUser following MemberRoleUpdate triggering by VVarden');
   }
 
   if (targetUser.roles.cache.has(Config.MEMBER_ROLE_ID)) return; // Member still has the role, no further action required
 
-  await targetUser.roles.add(Config.MEMBER_ROLE_ID);
-
-  logger.info(`${targetUser.user.username} was unblacklisted by VVarden and lost the default member role, role has been returned.`);
+  try {
+    await targetUser.roles.add(Config.MEMBER_ROLE_ID);
+    logger.info(
+      `${targetUser.user.username} was unblacklisted by VVarden and lost the default member role, role has been returned.`
+    );
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error(`Failed to add role to ${targetUser.user.username}: ${errorMessage}`);
+  }
 };
